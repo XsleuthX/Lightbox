@@ -216,6 +216,172 @@
 
   body.editing .seq-badge{ display:grid; }
 
+
+  /* === Layout presets popover & grid variants === */
+  .menu-popover{
+    position: fixed;
+    z-index: 99999;
+    min-width: 260px;
+    max-width: 360px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.15);
+    background: rgba(20,22,28,.94);
+    color:#fff;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 22px 60px rgba(0,0,0,.55);
+    pointer-events: auto;
+  }
+  .menu-popover[hidden]{ display:none !important; }
+  .menu-popover .row{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+  .menu-popover h3{ margin: 4px 0 6px; font-size: 12px; letter-spacing: .08em; opacity:.8; text-transform: uppercase; }
+  .menu-popover button{
+    padding:8px 10px; border-radius: 10px; border:1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.06); color:#fff; cursor:pointer;
+  }
+  .menu-popover button:hover{ background: rgba(255,255,255,.12); }
+  .grid.cols-2{ grid-template-columns: repeat(2, 1fr) !important; }
+  .grid.cols-3{ grid-template-columns: repeat(3, 1fr) !important; }
+  .grid.cols-4{ grid-template-columns: repeat(4, 1fr) !important; }
+  .grid.filmstrip{
+    grid-auto-flow: column;
+    grid-template-columns: none !important;
+    grid-auto-columns: minmax(280px, 1fr);
+    overflow: auto;
+  }
+
+
+  /* === Tile Edit: context menu + editor modal === */
+  .tile-ctx {
+    position: fixed; z-index: 100000;
+    min-width: 160px; padding: 8px;
+    border-radius: 10px; border:1px solid rgba(255,255,255,.16);
+    background: rgba(20,22,28,.96); color:#fff;
+    box-shadow: 0 20px 60px rgba(0,0,0,.55);
+    backdrop-filter: blur(8px);
+  }
+  .tile-ctx[hidden]{ display:none !important; }
+  .tile-ctx button {
+    width:100%; text-align:left; padding:8px 10px;
+    border-radius:8px; border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.06); color:#fff; cursor:pointer;
+  }
+  .tile-ctx button:hover{ background:rgba(255,255,255,.12); }
+
+  .editor-modal{
+    position: fixed; inset:0; z-index: 100001;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(0,0,0,.55);
+  }
+  .editor-modal[hidden]{ display:none !important; }
+  .editor-sheet{
+    display:grid; grid-template-columns: minmax(320px, 66vh) 320px;
+    gap:18px; padding:18px;
+    border-radius:16px; border:1px solid rgba(255,255,255,.16);
+    background: rgba(18,20,26,.96); color:#fff; box-shadow:0 26px 80px rgba(0,0,0,.6);
+    max-width: min(92vw, 1200px);
+  }
+  @media (max-width: 900px){
+    .editor-sheet{ grid-template-columns: 1fr; }
+  }
+  .edit-stage{
+    position: relative; width: 100%; aspect-ratio: 1 / 1;
+background: #0f1115;
+    border-radius: 12px; overflow: hidden;
+    border:1px solid rgba(255,255,255,.16);
+    touch-action: none;
+  }
+  .edit-stage img{
+    position:absolute; left:50%; top:50%;
+    transform: translate(-50%,-50%) scale(var(--s,1));
+    transform-origin: 50% 50%;
+    user-select:none; -webkit-user-drag:none; pointer-events:none;
+    will-change: transform;
+  }
+  /* Crop bounding box (priority interaction target) */
+  .crop-box{
+    position:absolute; left:0; top:0; width:60%; height:60%;
+    border:2px solid rgba(255,255,255,.95);
+    box-shadow: 0 0 0 200vmax rgba(0,0,0,.35); /* dim outside area */
+    cursor: move; z-index:2;
+  }
+  .crop-box .grid-lines{
+    position:absolute; inset:0; pointer-events:none;
+    background:
+      linear-gradient(to right, rgba(255,255,255,.75) 1px, transparent 1px) 33.333% 0/33.333% 100%,
+      linear-gradient(to right, rgba(255,255,255,.75) 1px, transparent 1px) 66.666% 0/33.333% 100%,
+      linear-gradient(to bottom, rgba(255,255,255,.75) 1px, transparent 1px) 0 33.333%/100% 33.333%,
+      linear-gradient(to bottom, rgba(255,255,255,.75) 1px, transparent 1px) 0 66.666%/100% 33.333%;
+    mix-blend-mode: screen;
+  }
+  .handle{
+    position:absolute; width:18px; height:18px; background:#fff; border-radius:3px;
+    border:1px solid rgba(0,0,0,.4); box-shadow:0 2px 6px rgba(0,0,0,.4);
+    z-index:3;
+  }
+  .handle::after{ /* generous hit-area */
+    content:""; position:absolute; inset:-8px; background:transparent;
+  }
+  .handle.tl{ left:-9px; top:-9px; cursor:nwse-resize; }
+  .handle.tr{ right:-9px; top:-9px; cursor:nesw-resize; }
+  .handle.br{ right:-9px; bottom:-9px; cursor:nwse-resize; }
+  .handle.bl{ left:-9px; bottom:-9px; cursor:nesw-resize; }
+  .handle.t{ left:50%; top:-9px; transform:translateX(-50%); width:22px; height:12px; cursor:ns-resize; }
+  .handle.b{ left:50%; bottom:-9px; transform:translateX(-50%); width:22px; height:12px; cursor:ns-resize; }
+  .handle.l{ left:-9px; top:50%; transform:translateY(-50%); width:12px; height:22px; cursor:ew-resize; }
+  .handle.r{ right:-9px; top:50%; transform:translateY(-50%); width:12px; height:22px; cursor:ew-resize; }
+
+  .editor-controls{ display:grid; gap:12px; }
+  .ratio-row, .ctrl-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .ratio-row button, .ctrl-row button{
+    padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.06); color:#fff; cursor:pointer;
+  }
+  .ratio-row button.active{ background: rgba(215,194,159,.16); border-color: rgba(215,194,159,.5); }
+  .ctrl-row input[type="range"]{ width:100%; }
+  .editor-actions{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+  .editor-actions button{ padding:10px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#fff; cursor:pointer }
+  .editor-actions button.apply{ background: rgba(48,181,99,.18); border-color: rgba(48,181,99,.5); }
+  .editor-actions button.reset{ background: rgba(215,69,69,.12); border-color: rgba(215,69,69,.45); }
+
+
+/* Video tiles: preserve aspect, no warping inside tiles */
+.tile video{
+  width:100%; height:100%;
+  object-fit: contain;
+  display:block;
+}
+
+/* Context menu styling (reuse glass look) */
+.video-ctx {
+  position: fixed; z-index: 100000;
+  min-width: 160px; padding: 8px;
+  border-radius: 10px; border:1px solid rgba(255,255,255,.12);
+  background: rgba(20,22,28,.96); color:#fff;
+  box-shadow: 0 20px 60px rgba(0,0,0,.55);
+  backdrop-filter: blur(8px);
+}
+.video-ctx[hidden]{ display:none !important; }
+.video-ctx button{
+  width:100%; text-align:left; padding:8px 10px;
+  border-radius:8px; border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06); color:#fff; cursor:pointer;
+  margin-bottom:6px;
+}
+.video-ctx button:last-child{ margin-bottom:0; }
+.video-ctx button:hover{ background:rgba(255,255,255,.12); }
+
+
+.tile.fitw video, .tile[data-fit="width"] video{
+  width:100%; height:auto; object-fit: initial; /* size by width; no forced contain */
+  max-height:none;
+}
+
+
+/* Video tiles: default - preserve aspect; when AR overridden, fill both width & height */
+.tile video{ width:100%; height:100%; object-fit: contain; display:block; }
+.tile[data-ar-override] video{ object-fit: cover; } /* fills tile both axes without distortion (may crop) */
+
 </style>
 </head>
 <body>
@@ -240,6 +406,10 @@
       <div class="row">
         <label>Playback</label>
         <div id="autoPlayToggle" class="chip"><span class="dot"></span> Auto Play</div>
+      </div>
+      <div class="row">
+        <label>Layouts</label>
+        <div id="layoutBtn" class="chip"><span class="dot"></span> Layouts</div>
       </div>
     </div>
   </div>
@@ -646,7 +816,7 @@ if(!dragging) return;
       cPlay.textContent='❚❚';
     } else {
       lb.classList.remove('show-video');
-      lbImg.src=node.currentSrc||node.src;
+      lbImg.src=(node.dataset&&node.dataset.origSrc)?node.dataset.origSrc:(node.currentSrc||node.src);
       cPlay.textContent='►';
       controls.classList.remove('show');
     }
@@ -1010,6 +1180,606 @@ if(!dragging) return;
     const t = e.target;
     if (wrapEl.contains(t) || t.closest('.lb-btn')) showUI();
   });
-})();</script>
+})();
+// === Layout Presets ===
+document.addEventListener('DOMContentLoaded', function(){
+  const gridEl = document.getElementById('grid');
+  const btn = document.getElementById('layoutBtn');
+  const menu = document.getElementById('layoutMenu');
+  if(!gridEl || !btn || !menu) return;
+
+  function tiles(){ return Array.from(gridEl.querySelectorAll('.tile')); }
+  function clearSizes(){ tiles().forEach(t=>t.classList.remove('size-2')); }
+  function clearGridClasses(){ gridEl.classList.remove('cols-2','cols-3','cols-4','filmstrip'); }
+
+  function applyLayout(kind){
+    clearGridClasses();
+    if(kind === 'masonry'){
+      clearSizes();
+    } else if(kind === 'shuffle'){
+      const arr = tiles();
+      for(let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      arr.forEach(t=>gridEl.appendChild(t));
+    } else if(kind === 'hero-left'){
+      clearSizes();
+      const arr = tiles(); if(arr[0]) arr[0].classList.add('size-2');
+    } else if(kind === 'hero-right'){
+      clearSizes();
+      const arr = tiles(); const last = arr[arr.length-1]; if(last) last.classList.add('size-2');
+    } else if(kind === 'twin-heroes'){
+      clearSizes();
+      const arr = tiles(); if(arr[0]) arr[0].classList.add('size-2'); if(arr[1]) arr[1].classList.add('size-2');
+    } else if(kind === 'checker'){
+      clearSizes();
+      tiles().forEach((t,i)=>{ if(i % 5 === 0) t.classList.add('size-2'); });
+    } else if(kind === 'cols-2'){
+      gridEl.classList.add('cols-2'); clearSizes();
+    } else if(kind === 'cols-3'){
+      gridEl.classList.add('cols-3'); clearSizes();
+    } else if(kind === 'cols-4'){
+      gridEl.classList.add('cols-4'); clearSizes();
+    } else if(kind === 'filmstrip'){
+      gridEl.classList.add('filmstrip'); clearSizes();
+    } else if(kind === 'reset-sizes'){
+      clearSizes();
+    } else if(kind === 'reset-all'){
+      clearSizes(); clearGridClasses();
+    }
+    if (typeof updateSequenceIndices === 'function') {
+      updateSequenceIndices();
+    } else {
+      tiles().forEach((t,i)=>{ const b=t.querySelector('.seq-badge'); if(b) b.textContent=i; });
+    }
+  }
+
+  function openMenuNear(el){
+    // ensure visible to measure
+    menu.hidden = false; menu.style.display = 'block';
+    const r = el.getBoundingClientRect();
+    const mw = menu.offsetWidth || 280, mh = menu.offsetHeight || 200;
+    let x = Math.min(r.left, window.innerWidth - mw - 12);
+    let y = Math.min(r.bottom + 6, window.innerHeight - mh - 12);
+    x = Math.max(12, x); y = Math.max(12, y);
+    menu.style.left = x + 'px';
+    menu.style.top  = y + 'px';
+  }
+  function closeMenu(){ menu.hidden = true; menu.style.display = 'none'; }
+
+  btn.addEventListener('click', (e)=>{ e.stopPropagation(); openMenuNear(btn); });
+  btn.addEventListener('contextmenu', (e)=>{ e.preventDefault(); e.stopPropagation(); openMenuNear(btn); });
+  window.addEventListener('click', (e)=>{ if(!menu.contains(e.target) && e.target !== btn) closeMenu(); });
+  window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeMenu(); });
+
+  menu.addEventListener('click', (e)=>{
+    const b = e.target.closest('button[data-layout]'); if(!b) return;
+    applyLayout(b.getAttribute('data-layout'));
+    closeMenu();
+  });
+});
+
+
+// === Tile Edit (from scratch, thumbnails only) ===
+document.addEventListener('DOMContentLoaded', function(){
+  const grid = document.getElementById('grid');
+  const editToggle = document.getElementById('editToggle');
+
+  const ctxMenu = document.getElementById('tileCtx');
+  const ctxEdit = document.getElementById('ctxEdit');
+
+  const modal = document.getElementById('editorModal');
+  const stage = document.getElementById('editStage');
+  const editImg = document.getElementById('editImg');
+  const cropBox = document.getElementById('cropBox');
+  const zoomSlider = document.getElementById('zoomSlider');
+  const ratioRow = document.getElementById('ratioRow');
+  const btnApply = document.getElementById('editApply');
+  const btnCancel = document.getElementById('editCancel');
+  const btnReset = document.getElementById('editReset');
+
+  // state
+  let targetTile = null;
+  let natW = 0, natH = 0;
+  let zoom = 1;           // multiplicative, unbounded (we auto-extend slider)
+  let logZ = 0;           // log2(zoom) for slider
+  let offsetX = 0, offsetY = 0; // stage px offset of image center relative to stage center
+  let box = { x:0, y:0, w:0, h:0 }; // crop box in stage px
+  let boxAR = 1;          // default 1:1
+  const MIN_SIDE = 30;
+
+  function isEditing(){ return document.body.classList.contains('editing') || (editToggle && editToggle.classList.contains('active')); }
+
+  // open context menu
+  grid.addEventListener('contextmenu', (e)=>{
+    if(!isEditing()) return;
+    const tile = e.target.closest('.tile');
+    if(!tile) return;
+    if(!tile.querySelector('img')) return; // images only
+    e.preventDefault(); e.stopPropagation();
+    targetTile = tile;
+    openCtxAt(e.clientX, e.clientY);
+  });
+
+  function openCtxAt(x,y){
+    ctxMenu.hidden = false;
+    const mw = ctxMenu.offsetWidth || 160, mh = ctxMenu.offsetHeight || 40;
+    const lx = Math.min(x, window.innerWidth - mw - 8);
+    const ly = Math.min(y, window.innerHeight - mh - 8);
+    ctxMenu.style.left = Math.max(8, lx) + 'px';
+    ctxMenu.style.top  = Math.max(8, ly) + 'px';
+  }
+  function closeCtx(){ ctxMenu.hidden = true; }
+  window.addEventListener('click', (e)=>{ if(!ctxMenu.contains(e.target)) closeCtx(); });
+  window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeCtx(); });
+
+  // Open editor
+  ctxEdit.addEventListener('click', async ()=>{
+closeCtx();
+    if(!targetTile) return;
+    const img = targetTile.querySelector('img');
+    if(!img) return;
+
+    if(!img.dataset.origSrc) img.dataset.origSrc = img.currentSrc || img.src;
+
+    const safeUrl = await getSafeEditableURL(img.dataset.origSrc);
+    editImg.crossOrigin = 'anonymous';
+    editImg.referrerPolicy = 'no-referrer';
+    editImg.src = safeUrl;
+    await imgOnLoad(editImg);
+
+    natW = editImg.naturalWidth; natH = editImg.naturalHeight;
+    
+
+    modal.hidden = false;
+    await new Promise(requestAnimationFrame);
+    resetEditorState();
+    await new Promise(requestAnimationFrame);
+    applyStage(); applyBox();
+  
+    // Normalize target tile image styles to avoid inherited distortions
+    try{
+      const timg = targetTile.querySelector('img');
+      if (timg){
+        timg.style.transform='';
+        timg.style.objectFit='contain';
+        timg.removeAttribute('width'); timg.removeAttribute('height');
+        timg.style.width = '100%'; timg.style.height = '100%';
+      }
+    }catch(_){}
+    
+});
+
+  function resetEditorState(){
+// zoom baseline
+    zoom = 1; logZ = 0; zoomSlider.min = -4; zoomSlider.max = 4; zoomSlider.value = '0';
+    offsetX = 0; offsetY = 0;
+    // default AR: 1:1 and make UI reflect it
+    boxAR = 1;
+    if (ratioRow) {
+      ratioRow.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+      const sq = ratioRow.querySelector('button[data-ar="1:1"]');
+      if (sq) sq.classList.add('active');
+    
+}// 50% of stage area, constrained to 1:1, centered
+    const r = stage.getBoundingClientRect();
+    const W = r.width, H = r.height;
+    const area = 0.5 * W * H;
+    let side = Math.sqrt(area);
+    side = Math.max(MIN_SIDE, Math.min(side, Math.min(W, H)));
+    box.w = side; box.h = side;
+    box.x = (W - side) / 2;
+    box.y = (H - side) / 2;
+    applyStage();
+    applyBox();
+  }
+
+  function imgOnLoad(el){ return new Promise(res=>{ if(el.complete) res(); else el.onload = res; }); }
+
+  // Infinite zoom helpers: zoom = 2^logZ; slider extends when reaching near edges
+  function setZoomFromLog(newLogZ, anchorX=0, anchorY=0){
+    const rect = stage.getBoundingClientRect();
+    const CW = rect.width, CH = rect.height;
+    const baseScale = Math.min(CW / natW, CH / natH); // contain fit
+    const oldScale = baseScale * Math.pow(2, logZ);
+    const newScale = baseScale * Math.pow(2, newLogZ);
+    offsetX = offsetX + (1 - newScale/oldScale) * (anchorX - offsetX);
+    offsetY = offsetY + (1 - newScale/oldScale) * (anchorY - offsetY);
+    logZ = newLogZ; zoom = Math.pow(2, logZ);
+    const EPS = 0.08;
+    const vmax = parseFloat(zoomSlider.max); const vmin = parseFloat(zoomSlider.min);
+    if(logZ > vmax - EPS) zoomSlider.max = String(vmax + 2);
+    if(logZ < vmin + EPS) zoomSlider.min = String(vmin - 2);
+    zoomSlider.value = String(logZ);
+    applyStage();
+  }
+  function applyStage(){
+    // Compute contain-fit base scale so the image fits the stage
+    const rect = stage.getBoundingClientRect();
+    const baseScale = Math.min(rect.width / natW, rect.height / natH);
+    const s = baseScale * Math.pow(2, logZ); // combined scale = fit * zoom
+    stage.style.setProperty('--s', s);
+    // Keep translate logic tied to current offsets
+    editImg.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${s})`;
+  }
+
+  zoomSlider.addEventListener('input', ()=>{
+    const v = parseFloat(zoomSlider.value)||0;
+    setZoomFromLog(v, 0, 0);
+  });
+  stage.addEventListener('wheel', (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    const rect = stage.getBoundingClientRect();
+    const ax = e.clientX - rect.left - rect.width/2;
+    const ay = e.clientY - rect.top  - rect.height/2;
+    const d = -e.deltaY * 0.0015;
+    setZoomFromLog(logZ + d, ax, ay);
+  }, {passive:false});
+
+  // Stage drag => pan image (cropBox interactions have priority)
+  let panning = false, panStart = null;
+  stage.addEventListener('pointerdown', (e)=>{
+    if(e.target.closest('#cropBox')) return;
+    panning = true;
+    panStart = { ex:e.clientX, ey:e.clientY, ox:offsetX, oy:offsetY };
+    stage.setPointerCapture?.(e.pointerId);
+  });
+  stage.addEventListener('pointermove', (e)=>{
+    if(!panning) return;
+    const dx = e.clientX - panStart.ex;
+    const dy = e.clientY - panStart.ey;
+    offsetX = panStart.ox + dx;
+    offsetY = panStart.oy + dy;
+    applyStage();
+  });
+  stage.addEventListener('pointerup', ()=>{ panning=false; });
+  stage.addEventListener('pointercancel', ()=>{ panning=false; });
+
+  // Crop box drag/resize with AR lock
+  function stageRect(){ return stage.getBoundingClientRect(); }
+  function applyBox(){
+    cropBox.style.left = box.x + 'px';
+    cropBox.style.top  = box.y + 'px';
+    cropBox.style.width  = box.w + 'px';
+    cropBox.style.height = box.h + 'px';
+  }
+  function clampBox(){
+    const r = stageRect();
+    box.w = Math.max(MIN_SIDE, Math.min(box.w, r.width));
+    box.h = Math.max(MIN_SIDE, Math.min(box.h, r.height));
+    box.x = Math.max(0, Math.min(box.x, r.width  - box.w));
+    box.y = Math.max(0, Math.min(box.y, r.height - box.h));
+  }
+
+  function pointerToStage(e, r){
+    return { x: Math.max(0, Math.min(e.clientX - r.left, r.width)), y: Math.max(0, Math.min(e.clientY - r.top, r.height)) };
+  }
+
+  let dragMode = null, start = null, anchor = null;
+  cropBox.addEventListener('pointerdown', (e)=>{
+    e.stopPropagation();
+    const h = e.target.closest('.handle');
+    const r = stageRect();
+    start = { ex:e.clientX, ey:e.clientY, box:{...box}, r };
+    if(h){
+      if(h.classList.contains('tl')) dragMode='tl';
+      else if(h.classList.contains('tr')) dragMode='tr';
+      else if(h.classList.contains('br')) dragMode='br';
+      else if(h.classList.contains('bl')) dragMode='bl';
+      else if(h.classList.contains('t')) dragMode='t';
+      else if(h.classList.contains('r')) dragMode='r';
+      else if(h.classList.contains('b')) dragMode='b';
+      else if(h.classList.contains('l')) dragMode='l';
+      anchor = oppositeCorner(dragMode, start.box);
+    } else {
+      dragMode='move';
+    }
+    cropBox.setPointerCapture?.(e.pointerId);
+  });
+  cropBox.addEventListener('pointermove', (e)=>{
+    if(!dragMode) return;
+    const dx = e.clientX - start.ex;
+    const dy = e.clientY - start.ey;
+    let nx, ny, nw, nh;
+    if(dragMode==='move'){
+      box.x = start.box.x + dx;
+      box.y = start.box.y + dy;
+      clampBox(); applyBox(); return;
+    }
+    const r = start.r;
+    if(dragMode==='tl' || dragMode==='tr' || dragMode==='br' || dragMode==='bl'){
+      const p = pointerToStage(e, r); const a = anchor;
+      nx = Math.min(p.x, a.x); ny = Math.min(p.y, a.y); nw = Math.abs(p.x - a.x); nh = Math.abs(p.y - a.y);
+      if(boxAR){
+        if(nw/nh > boxAR){ nw = nh*boxAR; } else { nh = nw/boxAR; }
+        nx = Math.min(a.x, a.x - nw); ny = Math.min(a.y, a.y - nh);
+      }
+    } else {
+      nx = start.box.x; ny = start.box.y; nw = start.box.w; nh = start.box.h;
+      if(dragMode==='l'){ nx += dx; nw -= dx; }
+      if(dragMode==='r'){ nw += dx; }
+      if(dragMode==='t'){ ny += dy; nh -= dy; }
+      if(dragMode==='b'){ nh += dy; }
+      if(boxAR){
+        if(dragMode==='l' || dragMode==='r'){ nh = nw / boxAR; ny = start.box.y + (start.box.h - nh)/2; }
+        else { nw = nh * boxAR; nx = start.box.x + (start.box.w - nw)/2; }
+      }
+    }
+    const r2 = stageRect();
+    nx = Math.max(0, Math.min(nx, r2.width));
+    ny = Math.max(0, Math.min(ny, r2.height));
+    nw = Math.max(MIN_SIDE, Math.min(nw, r2.width  - nx));
+    nh = Math.max(MIN_SIDE, Math.min(nh, r2.height - ny));
+    box = { x:nx, y:ny, w:nw, h:nh };
+    applyBox();
+  });
+  cropBox.addEventListener('pointerup', ()=>{ dragMode=null; });
+  cropBox.addEventListener('pointercancel', ()=>{ dragMode=null; });
+
+  function oppositeCorner(handle, b){
+    if(handle==='tl') return { x:b.x+b.w, y:b.y+b.h };
+    if(handle==='tr') return { x:b.x,     y:b.y+b.h };
+    if(handle==='br') return { x:b.x,     y:b.y };
+    if(handle==='bl') return { x:b.x+b.w, y:b.y };
+    return { x:b.x+b.w/2, y:b.y+b.h/2 };
+  }
+
+  // Aspect ratio buttons only affect crop box
+  ratioRow.addEventListener('click', (e)=>{
+    const b = e.target.closest('button[data-ar]'); if(!b) return;
+    ratioRow.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const v = b.getAttribute('data-ar');
+    if(v==='free'){ boxAR = null; }
+    else {
+      const parts = v.split(':');
+      const a = parseFloat(parts[0]); const h = parseFloat(parts[1]);
+      boxAR = a/h;
+    }
+    const r = stageRect();
+    const cx = box.x + box.w/2, cy = box.y + box.h/2;
+    let w = box.w, h = box.h;
+    if(boxAR){
+      if(w/h > boxAR){ w = h*boxAR; } else { h = w/boxAR; }
+      w = Math.min(w, r.width); h = Math.min(h, r.height);
+      let x = cx - w/2, y = cy - h/2;
+      box = { x: Math.max(0, Math.min(x, r.width - w)), y: Math.max(0, Math.min(y, r.height - h)), w, h };
+    }
+    applyBox();
+  });
+
+  // Apply/Cancel/Reset
+  btnCancel.addEventListener('click', ()=>{ modal.hidden = true; });
+  btnReset.addEventListener('click', ()=>{ resetEditorState(); });
+
+  btnApply.addEventListener('click', async ()=>{
+if(!targetTile) return;
+    const timg = targetTile.querySelector('img');
+    if(!timg) return;
+    const rect = stage.getBoundingClientRect();
+    const CW = rect.width, CH = rect.height;
+    const baseScale = Math.min(CW / natW, CH / natH);
+    const scale = baseScale * zoom;
+
+    const cx = natW/2 - offsetX / scale;
+    const cy = natH/2 - offsetY / scale;
+    const sx = cx + (box.x - CW/2) / scale;
+    const sy = cy + (box.y - CH/2) / scale;
+    const sw = box.w / scale;
+    const sh = box.h / scale;
+
+    const sxC = Math.max(0, Math.min(natW - sw, sx));
+    const syC = Math.max(0, Math.min(natH - sh, sy));
+    const swC = Math.max(1, Math.min(natW, sw));
+    const shC = Math.max(1, Math.min(natH, sh));
+
+    const canvas = document.createElement('canvas');
+    // Export at the crop's native pixel size (preserve as much resolution as possible)
+    const outW = Math.max(1, Math.round(swC));
+    const outH = Math.max(1, Math.round(shC));
+    // Safety cap to avoid extreme memory usage; does not upscale
+    const MAX_OUT = 4096;
+    const scaleOut = Math.min(1, MAX_OUT / Math.max(outW, outH));
+    canvas.width = Math.max(1, Math.round(outW * scaleOut));
+    canvas.height = Math.max(1, Math.round(outH * scaleOut));
+    const ctx2d = canvas.getContext('2d');
+    ctx2d.imageSmoothingEnabled = true;
+    ctx2d.imageSmoothingQuality = 'high';
+    try{
+      ctx2d.drawImage(editImg, sxC, syC, swC, shC, 0, 0, canvas.width, canvas.height);const blob = await new Promise(res=>canvas.toBlob(res, 'image/jpeg', 0.95));
+      if(blob){
+        const url = URL.createObjectURL(blob);
+        if(!timg.dataset.origSrc) timg.dataset.origSrc = timg.currentSrc || timg.src;
+        if(timg.dataset.croppedSrc){ try{ URL.revokeObjectURL(timg.dataset.croppedSrc); }catch(_){ } }
+        timg.src = url; timg.dataset.croppedSrc = url;
+        // Update tile aspect-ratio to match cropped thumb
+        try{ targetTile.style.aspectRatio = `${canvas.width}/${canvas.height}`; 
+    // Ensure no warping: clear any width/height attrs and transforms; enforce contain
+    try{
+      timg.removeAttribute('width'); timg.removeAttribute('height');
+      timg.style.transform = '';
+      timg.style.objectFit = 'contain';
+      timg.style.width = '100%'; timg.style.height = '100%';
+    }catch(_){ }}catch(_){}
+      }
+    }catch(err){
+      console.warn('Canvas blocked; skipping fallback to keep lightbox pristine.', err);
+    }
+    modal.hidden = true;
+  
+
+});
+
+  // ===== Helpers =====
+  async function getSafeEditableURL(srcUrl){
+    if(!srcUrl) throw new Error('No source URL');
+    if(srcUrl.startsWith('blob:')) return srcUrl;
+    try{
+      const u = new URL(srcUrl, location.href);
+      if(u.origin === location.origin) return srcUrl;
+    }catch(_){}
+    const resp = await fetch(srcUrl, { mode:'cors', credentials:'omit', referrerPolicy:'no-referrer' });
+    if(!resp.ok) throw new Error('CORS fetch failed: '+resp.status);
+    const blob = await resp.blob();
+    return URL.createObjectURL(blob);
+  }
+});
+
+
+// ===== Video tile aspect ratio context menu =====
+document.addEventListener('DOMContentLoaded', function(){
+  const grid = document.getElementById('grid');
+  const editToggle = document.getElementById('editToggle');
+  const videoCtx = document.getElementById('videoCtx');
+  let targetVideoTile = null;
+
+  function isEditing(){ 
+    return document.body.classList.contains('editing') 
+      || (editToggle && (editToggle.classList.contains('active') || editToggle.checked));
+  }
+
+  function openVideoCtx(x,y){
+    videoCtx.hidden = false;
+    const mw = videoCtx.offsetWidth || 160, mh = videoCtx.offsetHeight || 120;
+    const lx = Math.min(x, window.innerWidth - mw - 8);
+    const ly = Math.min(y, window.innerHeight - mh - 8);
+    videoCtx.style.left = Math.max(8, lx) + 'px';
+    videoCtx.style.top  = Math.max(8, ly) + 'px';
+  }
+  function closeVideoCtx(){ videoCtx.hidden = true; targetVideoTile = null; }
+
+  if (grid){
+    grid.addEventListener('contextmenu', (e)=>{
+      if(!isEditing()) return;
+      const tile = e.target.closest('.tile');
+      if(!tile) return;
+      const vid = tile.querySelector('video');
+      if(!vid) return;
+      e.preventDefault(); e.stopPropagation();
+      targetVideoTile = tile;
+      openVideoCtx(e.clientX, e.clientY);
+    });
+  }
+
+  
+videoCtx.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button[data-ar]');
+    if(!btn || !targetVideoTile) return;
+    const val = btn.getAttribute('data-ar'); // "reset", "1:1", "16:9", "9:16"
+    if(val === 'reset'){
+      // Remove any overrides and return to default contain behavior
+      try{
+        targetVideoTile.style.removeProperty('aspect-ratio');
+        targetVideoTile.removeAttribute('data-ar-override');
+        if (targetVideoTile.dataset) delete targetVideoTile.dataset.arOverride;
+        targetVideoTile.classList.remove('fitw');
+        targetVideoTile.removeAttribute('data-fit');
+      }catch(_){}
+      closeVideoCtx();
+      return;
+    }
+    const [a,b] = val.split(':').map(Number);
+    if(a>0 && b>0){
+      targetVideoTile.style.aspectRatio = `${a} / ${b}`;
+      targetVideoTile.dataset.arOverride = `${a}:${b}`; // triggers object-fit: cover via CSS
+      targetVideoTile.classList.remove('fitw');
+      targetVideoTile.removeAttribute('data-fit');
+    }
+    closeVideoCtx();
+  });
+
+  window.addEventListener('click', (e)=>{ if(!videoCtx.contains(e.target)) closeVideoCtx(); });
+  window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeVideoCtx(); });
+
+  // Ensure lightbox uses original video source (best-effort patch if pattern present)
+  const lb = document.getElementById('lightbox');
+  if (lb){
+    const vid = lb.querySelector('video');
+    // No direct changes here; lightbox player will use media's src as-is.
+    // Tile aspect-ratio only changes the CSS of the grid tile and not the video source.
+  }
+});
+
+
+
+</script>
+
+  <!-- Layout presets menu -->
+  <div id="layoutMenu" class="menu-popover" hidden>
+    <h3>Templates</h3>
+    <div class="row">
+      <button data-layout="masonry">Masonry (default)</button>
+      <button data-layout="shuffle">Shuffle</button>
+      <button data-layout="hero-left">Hero Left</button>
+      <button data-layout="hero-right">Hero Right</button>
+      <button data-layout="twin-heroes">Twin Heroes</button>
+      <button data-layout="checker">Checkerboard</button>
+    </div>
+    <h3>Columns</h3>
+    <div class="row">
+      <button data-layout="cols-2">2 Columns</button>
+      <button data-layout="cols-3">3 Columns</button>
+      <button data-layout="cols-4">4 Columns</button>
+      <button data-layout="filmstrip">Filmstrip</button>
+    </div>
+    <div class="row">
+      <button data-layout="reset-sizes">Reset Sizes</button>
+      <button data-layout="reset-all">Reset All</button>
+    </div>
+  </div>
+
+  <!-- Tile context menu -->
+  <div id="tileCtx" class="tile-ctx" hidden>
+    <button id="ctxEdit">Edit</button>
+  </div>
+
+  <!-- Editor modal -->
+  <div id="editorModal" class="editor-modal" hidden>
+    <div class="editor-sheet">
+      <div class="edit-stage" id="editStage" style="--img-ar:1/1; --z:1;">
+        <img id="editImg" alt="Edit target">
+        <div id="cropBox" class="crop-box">
+          <div class="grid-lines"></div>
+          <div class="handle tl"></div><div class="handle tr"></div>
+          <div class="handle br"></div><div class="handle bl"></div>
+          <div class="handle t"></div><div class="handle r"></div>
+          <div class="handle b"></div><div class="handle l"></div>
+        </div>
+      </div>
+      <div class="editor-controls">
+        <div><strong>Aspect Ratio</strong></div>
+        <div class="ratio-row" id="ratioRow">
+          <button data-ar="free">Free</button>
+          <button data-ar="1:1" class="active">1:1</button>
+          <button data-ar="3:2">3:2</button>
+          <button data-ar="4:3">4:3</button>
+          <button data-ar="16:9">16:9</button>
+          <button data-ar="9:16">9:16</button>
+          <button data-ar="4:5">4:5</button>
+          <button data-ar="21:9">21:9</button>
+        </div>
+        <div><strong>Zoom</strong></div>
+        <div class="ctrl-row">
+          <input id="zoomSlider" type="range" min="-4" max="4" step="0.001" value="0">
+        </div>
+        <div class="editor-actions">
+          <button class="reset" id="editReset">Reset</button>
+          <button id="editCancel">Cancel</button>
+          <button class="apply" id="editApply">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Video Aspect Ratio context menu -->
+  <div id="videoCtx" class="video-ctx" hidden>
+    <button data-ar="reset">Reset</button>
+    <button data-ar="1:1">1 : 1</button>
+    <button data-ar="16:9">16 : 9</button>
+    <button data-ar="9:16">9 : 16</button>
+  </div>
+
 </body>
 </html>
