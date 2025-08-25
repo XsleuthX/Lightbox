@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lightbox IO</title>
+<title>Lightbox I/O</title>
 <style>
   :root{
     --bg:#0f1115; --stroke:rgba(255,255,255,.18); --text:rgba(255,255,255,.88);
@@ -77,6 +77,7 @@
   .tile{position:relative;aspect-ratio:1/1;border-radius:16px;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,.35);transition:transform .25s ease,box-shadow .25s ease,outline-color .25s;outline:1px solid rgba(255,255,255,.06)}
   .tile:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(0,0,0,.45);outline-color:rgba(255,255,255,.16)}
   .tile.size-2{grid-column:span 2;grid-row:span 2}
+.tile.size-3{grid-column:span 3;grid-row:span 3}
   .tile img,.tile video{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in;
   -webkit-user-drag: none;
 
@@ -382,6 +383,98 @@ background: #0f1115;
 .tile video{ width:100%; height:100%; object-fit: contain; display:block; }
 .tile[data-ar-override] video{ object-fit: cover; } /* fills tile both axes without distortion (may crop) */
 
+
+/* ===== Editor panel polish ===== */
+.editor-sheet{ gap:18px; }
+.editor-controls{
+  display:flex; flex-direction:column; gap:14px;
+  padding:14px 14px 16px;
+  min-width: 320px; max-width: 380px;
+  background: linear-gradient(180deg, rgba(18,20,26,.82), rgba(18,20,26,.66));
+  border:1px solid rgba(255,255,255,.10);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 10px 30px rgba(0,0,0,.30);
+  backdrop-filter: blur(8px);
+}
+.editor-controls .subhead{
+  font-weight: 700;
+  letter-spacing: .25px;
+  font-size: 13px;
+  opacity: .95;
+  padding: 2px 4px 6px;
+}
+/* Aspect ratio row — tidy spacing and true-to-shape buttons from earlier */
+.ratio-row{ --btnH: 52px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.ratio-row button[data-ar]{
+  height: var(--btnH);
+  width:  calc(var(--btnH) * var(--ar, 1));
+  min-width: 32px;
+  display:flex; align-items:center; justify-content:center;
+  padding:0; line-height:1; font-weight:600;
+  border-radius: 12px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color:#eef1f5;
+  cursor:pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,.28);
+  transition: transform .12s ease, background .15s ease, border-color .15s ease;
+}
+.ratio-row button[data-ar]:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+.ratio-row button[data-ar].active{ background: rgba(104,187,106,.20); border-color: rgba(104,187,106,.45); }
+.ratio-row button[data-ar="free"]{
+  --ar: 1;
+  background: repeating-linear-gradient(135deg, rgba(255,255,255,.10) 0 6px, rgba(255,255,255,.04) 6px 12px);
+  border-style: dashed;
+}
+
+/* Slider styling — consistent track/thumb across browsers */
+.ctrl-row{ display:flex; align-items:center; gap:10px; }
+.ctrl-row input[type="range"]{
+  width:100%; height: 8px; background: transparent; -webkit-appearance: none; appearance: none;
+}
+/* WebKit */
+.ctrl-row input[type="range"]::-webkit-slider-runnable-track{
+  height:8px; border-radius:999px;
+  background: linear-gradient(90deg, rgba(64,132,255,.8), rgba(255,255,255,.35));
+}
+.ctrl-row input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance: none; appearance: none;
+  width:18px; height:18px; border-radius:50%;
+  background:#0f1115; border:2px solid rgba(255,255,255,.9);
+  margin-top:-5px; box-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+/* Firefox */
+.ctrl-row input[type="range"]::-moz-range-track{
+  height:8px; border-radius:999px;
+  background: linear-gradient(90deg, rgba(64,132,255,.8), rgba(255,255,255,.35));
+}
+.ctrl-row input[type="range"]::-moz-range-thumb{
+  width:18px; height:18px; border-radius:50%;
+  background:#0f1115; border:2px solid rgba(255,255,255,.9);
+  box-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+
+/* Action buttons — rounded rectangles, consistent size & spacing */
+.editor-actions{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; }
+.editor-actions button{
+  height:44px; border-radius:12px;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.06);
+  color:#eef1f5; font-weight:600; letter-spacing:.2px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.28);
+  transition: transform .12s ease, background .15s ease, border-color .15s ease;
+}
+.editor-actions button:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+.editor-actions .reset{ background: rgba(215,69,69,.16); border-color: rgba(215,69,69,.45); }
+.editor-actions .apply{ background: rgba(48,181,99,.20); border-color: rgba(48,181,99,.5); }
+
+
+/* Click-through guard: when lightbox is not open, remove it from hit-testing entirely */
+.lightbox:not(.open){ display: none !important; }
+.lightbox.open{ display: grid; }
+#captionHit{ pointer-events:auto; }
+.lightbox:not(.open) #captionHit{ display:none !important; pointer-events:none !important; }
+
 </style>
 </head>
 <body>
@@ -418,12 +511,12 @@ background: #0f1115;
     <section class="stage" id="stage">
       <div class="grid" id="grid">
         <!-- Seed tiles -->
-        <div class="tile"><span class="seq-badge">0</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button></div><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop" alt=""></div>
-        <div class="tile"><span class="seq-badge">1</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button></div><img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=1200&auto=format&fit=crop" alt=""></div>
-        <div class="tile"><span class="seq-badge">2</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button></div><img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200&auto=format&fit=crop" alt=""></div>
-        <div class="tile"><span class="seq-badge">3</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button></div><img src="https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?q=80&w=1200&auto=format&fit=crop" alt=""></div>
-        <div class="tile"><span class="seq-badge">4</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button></div><img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop" alt=""></div>
-        <div class="tile"><span class="seq-badge">5</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button></div><img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200&auto=format&fit=crop" alt=""></div>
+        <div class="tile"><span class="seq-badge">0</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop" alt=""></div>
+        <div class="tile"><span class="seq-badge">1</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=1200&auto=format&fit=crop" alt=""></div>
+        <div class="tile"><span class="seq-badge">2</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200&auto=format&fit=crop" alt=""></div>
+        <div class="tile"><span class="seq-badge">3</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?q=80&w=1200&auto=format&fit=crop" alt=""></div>
+        <div class="tile"><span class="seq-badge">4</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop" alt=""></div>
+        <div class="tile"><span class="seq-badge">5</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200&auto=format&fit=crop" alt=""></div>
       </div>
 
       <!-- Lightbox -->
@@ -559,8 +652,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===== Tile tools =====
   function bindTileTools(tile){
     tile.querySelector('.tool-del').addEventListener('click',e=>{ e.stopPropagation(); tile.remove(); refreshMedia(); updateSequenceIndices(); });
-    tile.querySelector('.tool-s1').addEventListener('click',e=>{ e.stopPropagation(); tile.classList.remove('size-2'); });
-    tile.querySelector('.tool-s2').addEventListener('click',e=>{ e.stopPropagation(); tile.classList.add('size-2'); });
+    tile.querySelector('.tool-s1').addEventListener('click',e=>{ e.stopPropagation(); tile.classList.remove('size-2','size-3'); });
+    tile.querySelector('.tool-s2').addEventListener('click',e=>{ e.stopPropagation(); tile.classList.add('size-2'); tile.classList.remove('size-3'); });
+    tile.querySelector('.tool-s3').addEventListener('click',e=>{ e.stopPropagation(); tile.classList.add('size-3'); tile.classList.remove('size-2'); });
   }
 
   // ===== Selection + drop-box reorder =====
@@ -994,13 +1088,13 @@ if(!dragging) return;
 
   function addImageFromURL(url){
     const tile=document.createElement('div'); tile.className='tile';
-    tile.innerHTML='<div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button></div>';
+    tile.innerHTML='<div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div>';
     const img=document.createElement('img'); img.src=url; img.alt='';
     tile.appendChild(img); appendTile(tile);
   }
   function addVideoFromURL(url){
     const tile=document.createElement('div'); tile.className='tile';
-    tile.innerHTML='<div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button></div>';
+    tile.innerHTML='<div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div>';
     const vid=document.createElement('video');
     vid.src=url; vid.muted=true; vid.loop=true; vid.playsInline=true; vid.preload='metadata';
     tile.appendChild(vid); appendTile(tile);
@@ -1748,7 +1842,7 @@ videoCtx.addEventListener('click', (e)=>{
         </div>
       </div>
       <div class="editor-controls">
-        <div><strong>Aspect Ratio</strong></div>
+        <div class="subhead">Aspect Ratio</div>
         <div class="ratio-row" id="ratioRow">
           <button data-ar="free">Free</button>
           <button data-ar="1:1" class="active">1:1</button>
@@ -1759,7 +1853,7 @@ videoCtx.addEventListener('click', (e)=>{
           <button data-ar="4:5">4:5</button>
           <button data-ar="21:9">21:9</button>
         </div>
-        <div><strong>Zoom</strong></div>
+        <div class="subhead">Zoom</div>
         <div class="ctrl-row">
           <input id="zoomSlider" type="range" min="-4" max="4" step="0.001" value="0">
         </div>
@@ -1780,6 +1874,72 @@ videoCtx.addEventListener('click', (e)=>{
     <button data-ar="16:9">16 : 9</button>
     <button data-ar="9:16">9 : 16</button>
   </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const lb = document.getElementById('lightbox') || document.querySelector('.lightbox');
+  const lbShell = document.getElementById('lbShell') || (lb && lb.querySelector('.lb-shell'));
+  const captionHit = document.getElementById('captionHit') || (lb && lb.querySelector('.caption-hit, #captionHit'));
+  const videoCtx = document.getElementById('videoCtx');
+  const tileCtx = document.getElementById('tileCtx');
+  const layoutMenu = document.getElementById('layoutMenu');
+
+  function collapseCaptionHit(){
+    if(!captionHit) return;
+    const host = lbShell || lb || document.documentElement;
+    try{ host.style.setProperty('--hit-left','0px'); }catch(_){}
+    try{ host.style.setProperty('--hit-top','0px'); }catch(_){}
+    try{ host.style.setProperty('--hit-width','0px'); }catch(_){}
+    try{ host.style.setProperty('--hit-height','0px'); }catch(_){}
+    try{ captionHit.style.width='0px'; captionHit.style.height='0px'; }catch(_){}
+  }
+
+  function safeCloseLB(){
+    if(!lb) return;
+    lb.classList.remove('open');
+    lb.setAttribute('aria-hidden','true');
+    // Pause video if present
+    try{ const v = lb.querySelector('video'); if(v) v.pause(); }catch(_){}
+    // Hide stray overlays/menus
+    try{ collapseCaptionHit(); }catch(_){}
+    try{ if(videoCtx){ videoCtx.hidden = true; } }catch(_){}
+    try{ if(tileCtx){ tileCtx.hidden = true; } }catch(_){}
+    try{ if(layoutMenu){ layoutMenu.hidden = true; layoutMenu.style.display='none'; } }catch(_){}
+  }
+
+  // Close button
+  try{
+    const closeBtn = lb && (lb.querySelector('.lb-close') || lb.querySelector('[data-close]'));
+    if(closeBtn){
+      closeBtn.addEventListener('click', (e)=>{ e.preventDefault(); safeCloseLB(); }, {capture:true});
+    }
+  }catch(_){}
+  // Backdrop
+  try{ if(lb){ lb.addEventListener('click', (e)=>{ if(e.target === lb){ safeCloseLB(); } }); } }catch(_){}
+  // ESC
+  window.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ safeCloseLB(); } });
+
+  // Guard any existing closeLB()
+  try{
+    const oldClose = window.closeLB;
+    if(typeof oldClose === 'function'){
+      window.closeLB = function(){ try{ oldClose(); }catch(_){ } safeCloseLB(); };
+    }
+  }catch(_){}
+
+  // Guard updateCaptionHitZone when LB closed
+  try{
+    const oldUpd = window.updateCaptionHitZone;
+    if(typeof oldUpd === 'function'){
+      window.updateCaptionHitZone = function(){
+        if(!lb || !lb.classList.contains('open')){ collapseCaptionHit(); return; }
+        return oldUpd();
+      };
+    }
+  }catch(_){}
+});
+</script>
 
 </body>
 </html>
