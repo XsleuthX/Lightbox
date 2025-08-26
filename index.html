@@ -1,8 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Lightbox I/O</title>
 <style>
   :root{
@@ -478,107 +479,96 @@ background: #0f1115;
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <section class="panel">
-  <h1>Impression Controls</h1>
-  <div class="panel-controls">
-    <div class="controls-dial">
-      <div class="dial" id="dial"><div class="needle" id="needle"></div></div>
-      <div class="label"><span id="moodLabel">Impression • 0% (Greyscale)</span></div>
-    </div>
-    <div class="controls-actions">
-      <div class="row">
-        <label>Uploads</label>
-        <label class="btn" for="fileInput"><span class="dot"></span> Upload media</label>
-        <input id="fileInput" type="file" accept="image/*,video/*" multiple hidden>
-      </div>
-      <div class="row">
-        <label>Edit</label>
-        <div id="editToggle" class="chip"><span class="dot"></span> Edit mode</div>
-      </div>
-      <div class="row">
-        <label>Playback</label>
-        <div id="autoPlayToggle" class="chip"><span class="dot"></span> Auto Play</div>
-      </div>
-      <div class="row">
-        <label>Layouts</label>
-        <div id="layoutBtn" class="chip"><span class="dot"></span> Layouts</div>
-      </div>
-    </div>
-  </div>
+<div class="wrap">
+<section class="panel">
+<h1>Impression Controls</h1>
+<div class="panel-controls">
+<div class="controls-dial">
+<div class="dial" id="dial"><div class="needle" id="needle"></div></div>
+<div class="label"><span id="moodLabel">Impression • 0% (Greyscale)</span></div>
+</div>
+<div class="controls-actions">
+<div class="row">
+<label>Uploads</label>
+<label class="btn" for="fileInput"><span class="dot"></span> Upload media</label>
+<input accept="image/*,video/*" hidden="" id="fileInput" multiple="" type="file"/>
+</div>
+<div class="row">
+<label>Edit</label>
+<div class="chip" id="editToggle"><span class="dot"></span> Edit mode</div>
+</div>
+<div class="row">
+<label>Playback</label>
+<div class="chip" id="autoPlayToggle"><span class="dot"></span> Auto Play</div>
+</div>
+<div class="row">
+<label>Layouts</label>
+<div class="chip" id="layoutBtn"><span class="dot"></span> Layouts</div>
+</div><div class="row"><label>Slide Show</label><div class="chip" id="slideshowBtn"><span class="dot"></span> Slideshow</div></div>
+</div>
+</div>
 </section>
-
-    <section class="stage" id="stage">
-      <div class="grid" id="grid">
-        <!-- Seed tiles -->
-        <div class="tile"><span class="seq-badge">0</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop" alt=""></div>
-        <div class="tile"><span class="seq-badge">1</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=1200&auto=format&fit=crop" alt=""></div>
-        <div class="tile"><span class="seq-badge">2</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200&auto=format&fit=crop" alt=""></div>
-        <div class="tile"><span class="seq-badge">3</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?q=80&w=1200&auto=format&fit=crop" alt=""></div>
-        <div class="tile"><span class="seq-badge">4</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop" alt=""></div>
-        <div class="tile"><span class="seq-badge">5</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200&auto=format&fit=crop" alt=""></div>
-      </div>
-
-      <!-- Lightbox -->
-      <div class="lightbox" id="lightbox" aria-hidden="true">
-        <div class="lb-shell" id="lbShell">
-          <button class="lb-btn lb-close ah" id="lbClose" aria-label="Close">✕</button>
-          <button class="lb-btn lb-prev ah" id="lbPrev" aria-label="Previous">‹</button>
-
-          <div class="media-wrap" id="mediaWrap">
-            <img id="lbImage" class="media" alt="Expanded media" />
-            <video id="lbVideo" class="media" playsinline muted loop></video>
-
-            <!-- Bottom-Centered Controls (video-only) -->
-            <div class="controls" id="controls">
-              <button class="cbtn" id="cPrev" title="Previous (←)">⟨</button>
-              <button class="cbtn" id="cBack" title="Back 5s">−5s</button>
-              <button class="cbtn" id="cPlay" title="Play/Pause">►</button>
-              <button class="cbtn" id="cFwd" title="Forward 5s">+5s</button>
-              <span class="ctime" id="cTime">00:00 / 00:00</span>
-              <div class="seek"><input id="cSeek" type="range" min="0" max="1000" value="0"></div>
-              <button class="cbtn" id="cMute" title="Mute (M)">🔇</button>
-              <div class="vol"><input id="cVol" type="range" min="0" max="1" step="0.02" value="1"></div>
-              <select id="cSpeed" class="cspeed" title="Speed">
-                <option>0.5×</option><option>0.75×</option><option selected>1×</option><option>1.25×</option><option>1.5×</option><option>2×</option>
-              </select>
-              <button class="cbtn loop" id="cLoop" title="Loop">∞</button>
-              <button class="cbtn" id="cNext" title="Next (→)">⟩</button>
-            </div>
-
-            <div class="caption-handle" id="captionHandle" title="Show caption"></div>
-
-            <div class="caption-panel" id="captionPanel">
-              <div class="caption-head">
-                <div class="caption-title">Caption</div>
-                <button id="captionPin" class="pin" title="Pin panel">Pin</button>
-              </div>
-              <div class="caption-meta" id="captionMeta">—</div>
-              <input id="captionTitle" class="caption-input" placeholder="Title (optional)" />
-              <textarea id="captionText" class="caption-text" placeholder="Write notes or a description..."></textarea>
-              <button class="btn caption-save" id="captionSave"><span class="dot"></span> Save</button>
-            </div>
-          </div>
-
-          <div class="caption-hit" id="captionHit" aria-hidden="true"></div>
-
-          <button class="lb-btn lb-next ah" id="lbNext" aria-label="Next">›</button>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Global drop overlay -->
-  <div class="drop-overlay" id="dropOverlay">
-    <div class="drop-card">
+<section class="stage" id="stage">
+<div class="grid" id="grid">
+<!-- Seed tiles -->
+<div class="tile"><span class="seq-badge">0</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img alt="" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&amp;w=1200&amp;auto=format&amp;fit=crop"/></div>
+<div class="tile"><span class="seq-badge">1</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img alt="" src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&amp;w=1200&amp;auto=format&amp;fit=crop"/></div>
+<div class="tile"><span class="seq-badge">2</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img alt="" src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&amp;w=1200&amp;auto=format&amp;fit=crop"/></div>
+<div class="tile"><span class="seq-badge">3</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img alt="" src="https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?q=80&amp;w=1200&amp;auto=format&amp;fit=crop"/></div>
+<div class="tile"><span class="seq-badge">4</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img alt="" src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&amp;w=1200&amp;auto=format&amp;fit=crop"/></div>
+<div class="tile"><span class="seq-badge">5</span><div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div><img alt="" src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&amp;w=1200&amp;auto=format&amp;fit=crop"/></div>
+</div>
+<!-- Lightbox -->
+<div aria-hidden="true" class="lightbox" id="lightbox">
+<div class="lb-shell" id="lbShell">
+<button aria-label="Close" class="lb-btn lb-close ah" id="lbClose">✕</button>
+<button aria-label="Previous" class="lb-btn lb-prev ah" id="lbPrev">‹</button>
+<div class="media-wrap" id="mediaWrap">
+<img alt="Expanded media" class="media" id="lbImage">
+<video class="media" id="lbVideo" loop="" muted="" playsinline=""></video>
+<!-- Bottom-Centered Controls (video-only) -->
+<div class="controls" id="controls">
+<button class="cbtn" id="cPrev" title="Previous (←)">⟨</button>
+<button class="cbtn" id="cBack" title="Back 5s">−5s</button>
+<button class="cbtn" id="cPlay" title="Play/Pause">►</button>
+<button class="cbtn" id="cFwd" title="Forward 5s">+5s</button>
+<span class="ctime" id="cTime">00:00 / 00:00</span>
+<div class="seek"><input id="cSeek" max="1000" min="0" type="range" value="0"/></div>
+<button class="cbtn" id="cMute" title="Mute (M)">🔇</button>
+<div class="vol"><input id="cVol" max="1" min="0" step="0.02" type="range" value="1"/></div>
+<select class="cspeed" id="cSpeed" title="Speed">
+<option>0.5×</option><option>0.75×</option><option selected="">1×</option><option>1.25×</option><option>1.5×</option><option>2×</option>
+</select>
+<button class="cbtn loop" id="cLoop" title="Loop">∞</button>
+<button class="cbtn" id="cNext" title="Next (→)">⟩</button>
+</div>
+<div class="caption-handle" id="captionHandle" title="Show caption"></div>
+<div class="caption-panel" id="captionPanel">
+<div class="caption-head">
+<div class="caption-title">Caption</div>
+<button class="pin" id="captionPin" title="Pin panel">Pin</button>
+</div>
+<div class="caption-meta" id="captionMeta">—</div>
+<input class="caption-input" id="captionTitle" placeholder="Title (optional)">
+<textarea class="caption-text" id="captionText" placeholder="Write notes or a description..."></textarea>
+<button class="btn caption-save" id="captionSave"><span class="dot"></span> Save</button>
+</input></div>
+</img></div>
+<div aria-hidden="true" class="caption-hit" id="captionHit"></div>
+<button aria-label="Next" class="lb-btn lb-next ah" id="lbNext">›</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Global drop overlay -->
+<div class="drop-overlay" id="dropOverlay">
+<div class="drop-card">
       Drop images or videos to add
       <small>Files from your computer, or image/video links</small>
-    </div>
-  </div>
-
-  <!-- Floating drop box element -->
-  <div class="drop-box" id="dropBox" aria-hidden="true"></div>
-
+</div>
+</div>
+<!-- Floating drop box element -->
+<div aria-hidden="true" class="drop-box" id="dropBox"></div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   // ===== Dial =====
@@ -1798,84 +1788,78 @@ videoCtx.addEventListener('click', (e)=>{
 
 
 </script>
-
-  <!-- Layout presets menu -->
-  <div id="layoutMenu" class="menu-popover" hidden>
-    <h3>Templates</h3>
-    <div class="row">
-      <button data-layout="masonry">Masonry (default)</button>
-      <button data-layout="shuffle">Shuffle</button>
-      <button data-layout="hero-left">Hero Left</button>
-      <button data-layout="hero-right">Hero Right</button>
-      <button data-layout="twin-heroes">Twin Heroes</button>
-      <button data-layout="checker">Checkerboard</button>
-    </div>
-    <h3>Columns</h3>
-    <div class="row">
-      <button data-layout="cols-2">2 Columns</button>
-      <button data-layout="cols-3">3 Columns</button>
-      <button data-layout="cols-4">4 Columns</button>
-      <button data-layout="filmstrip">Filmstrip</button>
-    </div>
-    <div class="row">
-      <button data-layout="reset-sizes">Reset Sizes</button>
-      <button data-layout="reset-all">Reset All</button>
-    </div>
-  </div>
-
-  <!-- Tile context menu -->
-  <div id="tileCtx" class="tile-ctx" hidden>
-    <button id="ctxEdit">Edit</button>
-  </div>
-
-  <!-- Editor modal -->
-  <div id="editorModal" class="editor-modal" hidden>
-    <div class="editor-sheet">
-      <div class="edit-stage" id="editStage" style="--img-ar:1/1; --z:1;">
-        <img id="editImg" alt="Edit target">
-        <div id="cropBox" class="crop-box">
-          <div class="grid-lines"></div>
-          <div class="handle tl"></div><div class="handle tr"></div>
-          <div class="handle br"></div><div class="handle bl"></div>
-          <div class="handle t"></div><div class="handle r"></div>
-          <div class="handle b"></div><div class="handle l"></div>
-        </div>
-      </div>
-      <div class="editor-controls">
-        <div class="subhead">Aspect Ratio</div>
-        <div class="ratio-row" id="ratioRow">
-          <button data-ar="free">Free</button>
-          <button data-ar="1:1" class="active">1:1</button>
-          <button data-ar="3:2">3:2</button>
-          <button data-ar="4:3">4:3</button>
-          <button data-ar="16:9">16:9</button>
-          <button data-ar="9:16">9:16</button>
-          <button data-ar="4:5">4:5</button>
-          <button data-ar="21:9">21:9</button>
-        </div>
-        <div class="subhead">Zoom</div>
-        <div class="ctrl-row">
-          <input id="zoomSlider" type="range" min="-4" max="4" step="0.001" value="0">
-        </div>
-        <div class="editor-actions">
-          <button class="reset" id="editReset">Reset</button>
-          <button id="editCancel">Cancel</button>
-          <button class="apply" id="editApply">Apply</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- Video Aspect Ratio context menu -->
-  <div id="videoCtx" class="video-ctx" hidden>
-    <button data-ar="reset">Reset</button>
-    <button data-ar="1:1">1 : 1</button>
-    <button data-ar="16:9">16 : 9</button>
-    <button data-ar="9:16">9 : 16</button>
-  </div>
-
-
+<!-- Layout presets menu -->
+<div class="menu-popover" hidden="" id="layoutMenu">
+<h3>Templates</h3>
+<div class="row">
+<button data-layout="masonry">Masonry (default)</button>
+<button data-layout="shuffle">Shuffle</button>
+<button data-layout="hero-left">Hero Left</button>
+<button data-layout="hero-right">Hero Right</button>
+<button data-layout="twin-heroes">Twin Heroes</button>
+<button data-layout="checker">Checkerboard</button>
+</div>
+<h3>Columns</h3>
+<div class="row">
+<button data-layout="cols-2">2 Columns</button>
+<button data-layout="cols-3">3 Columns</button>
+<button data-layout="cols-4">4 Columns</button>
+<button data-layout="filmstrip">Filmstrip</button>
+</div>
+<div class="row">
+<button data-layout="reset-sizes">Reset Sizes</button>
+<button data-layout="reset-all">Reset All</button>
+</div>
+</div><div class="menu-popover" hidden id="slideshowMenu"><h3>Slide Direction</h3><div class="row"><button data-ss="down">Auto Scroll Down</button><button data-ss="up">Auto Scroll Up</button><button data-ss="left">Auto Scroll Left</button>
+      <button data-ss="right">Auto Scroll Right</button></div><div class="row"><button data-ss="stop">Stop</button></div></div>
+<!-- Tile context menu -->
+<div class="tile-ctx" hidden="" id="tileCtx">
+<button id="ctxEdit">Edit</button>
+</div>
+<!-- Editor modal -->
+<div class="editor-modal" hidden="" id="editorModal">
+<div class="editor-sheet">
+<div class="edit-stage" id="editStage" style="--img-ar:1/1; --z:1;">
+<img alt="Edit target" id="editImg"/>
+<div class="crop-box" id="cropBox">
+<div class="grid-lines"></div>
+<div class="handle tl"></div><div class="handle tr"></div>
+<div class="handle br"></div><div class="handle bl"></div>
+<div class="handle t"></div><div class="handle r"></div>
+<div class="handle b"></div><div class="handle l"></div>
+</div>
+</div>
+<div class="editor-controls">
+<div class="subhead">Aspect Ratio</div>
+<div class="ratio-row" id="ratioRow">
+<button data-ar="free">Free</button>
+<button class="active" data-ar="1:1">1:1</button>
+<button data-ar="3:2">3:2</button>
+<button data-ar="4:3">4:3</button>
+<button data-ar="16:9">16:9</button>
+<button data-ar="9:16">9:16</button>
+<button data-ar="4:5">4:5</button>
+<button data-ar="21:9">21:9</button>
+</div>
+<div class="subhead">Zoom</div>
+<div class="ctrl-row">
+<input id="zoomSlider" max="4" min="-4" step="0.001" type="range" value="0"/>
+</div>
+<div class="editor-actions">
+<button class="reset" id="editReset">Reset</button>
+<button id="editCancel">Cancel</button>
+<button class="apply" id="editApply">Apply</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Video Aspect Ratio context menu -->
+<div class="video-ctx" hidden="" id="videoCtx">
+<button data-ar="reset">Reset</button>
+<button data-ar="1:1">1 : 1</button>
+<button data-ar="16:9">16 : 9</button>
+<button data-ar="9:16">9 : 16</button>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
   const lb = document.getElementById('lightbox') || document.querySelector('.lightbox');
@@ -1939,6 +1923,246 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   }catch(_){}
 });
+</script>
+
+<script>
+  // --- Activate caption hit zone when the lightbox opens ---
+  (function ensureCaptionHitActivation(){
+    const lb        = document.getElementById('lightbox') || document.querySelector('.lightbox');
+    const lbShell   = document.getElementById('lbShell')  || (lb && lb.querySelector('.lb-shell'));
+    const captionHit= document.getElementById('captionHit') || (lb && lb.querySelector('#captionHit,.caption-hit'));
+  
+    if(!lb || !captionHit) return;
+  
+    function settleCaptionLayout(){
+      // turn the hit zone back on
+      try{
+        captionHit.hidden = false;
+        captionHit.style.display = '';
+        captionHit.style.pointerEvents = 'auto';
+      }catch(_){}
+  
+      // recompute geometry (these are your existing functions)
+      try{ measureAndSetCaptionSpace && measureAndSetCaptionSpace(); }catch(_){}
+      try{ updateCaptionHitZone && updateCaptionHitZone(); }catch(_){}
+      try{ applyComboShift && applyComboShift(); }catch(_){}
+      try{ fitControls && fitControls(); }catch(_){}
+    }
+  
+    // 1) Wrap openLB so every open re-activates and settles layout
+    try{
+      const oldOpen = window.openLB;
+      if (typeof oldOpen === 'function'){
+        window.openLB = function(){
+          const out = oldOpen.apply(this, arguments);
+          // let the class toggle/layout paint first
+          requestAnimationFrame(settleCaptionLayout);
+          return out;
+        };
+      }
+    }catch(_){}
+  
+    // 2) Watch for the 'open' class being added (covers non-openLB paths)
+    try{
+      const mo = new MutationObserver(muts=>{
+        if (lb.classList.contains('open')){
+          requestAnimationFrame(settleCaptionLayout);
+        }
+      });
+      mo.observe(lb, { attributes: true, attributeFilter: ['class'] });
+    }catch(_){}
+  
+    // 3) Re-settle after media becomes ready (image load / video metadata)
+    // Use capture so we catch events dispatched inside the lightbox subtree
+    lb.addEventListener('load',          ()=> settleCaptionLayout(), true);
+    lb.addEventListener('loadeddata',    ()=> settleCaptionLayout(), true);
+    lb.addEventListener('loadedmetadata',()=> settleCaptionLayout(), true);
+  
+    // 4) Also re-settle on resize (orientation / caption size changes)
+    window.addEventListener('resize', ()=> lb.classList.contains('open') && settleCaptionLayout());
+  })();
+  </script>  
+
+<script>
+// === Slideshow (auto-scroll) ===
+(function(){
+  const stage = document.getElementById('stage');
+  const gridEl = document.getElementById('grid');
+  const lb = document.getElementById('lightbox');
+  const editToggle = document.getElementById('editToggle');
+  const ssBtn = document.getElementById('slideshowBtn');
+  const ssMenu = document.getElementById('slideshowMenu');
+
+  if(!stage || !gridEl || !ssBtn || !ssMenu) return;
+
+  function openMenuNear(el){
+    ssMenu.hidden = false; ssMenu.style.display = 'block';
+    const r = el.getBoundingClientRect();
+    const mw = ssMenu.offsetWidth || 260, mh = ssMenu.offsetHeight || 160;
+    let x = Math.min(r.left, window.innerWidth - mw - 12);
+    let y = Math.min(r.bottom + 6, window.innerHeight - mh - 12);
+    x = Math.max(12, x); y = Math.max(12, y);
+    ssMenu.style.left = x + 'px';
+    ssMenu.style.top  = y + 'px';
+  }
+  function closeMenu(){ ssMenu.hidden = true; ssMenu.style.display = 'none'; }
+  ssBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openMenuNear(ssBtn); });
+  ssBtn.addEventListener('contextmenu', (e)=>{ e.preventDefault(); e.stopPropagation(); openMenuNear(ssBtn); });
+  window.addEventListener('click', (e)=>{ if(!ssMenu.contains(e.target) && e.target !== ssBtn) closeMenu(); });
+  window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeMenu(); });
+
+  const state = { mode:null, raf:0, last:0, speed:70, accX:0, accY:0 };
+
+  function isEditing(){
+    return document.body.classList.contains('editing') || (editToggle && (editToggle.classList.contains('active') || editToggle.checked));
+  }
+  function stopLoop(){
+    if(state.raf){ cancelAnimationFrame(state.raf); state.raf = 0; }
+    state.mode = null; state.last = 0;
+    ssBtn.classList.remove('active');
+  }
+
+  function horizTarget(){
+    // Use grid element when it's in filmstrip mode; else use stage
+    return gridEl.classList.contains('filmstrip') ? gridEl : stage;
+  }
+
+  function step(ts){
+    if(!state.mode){ state.raf = 0; return; }
+    if(state.last === 0) state.last = ts;
+    let dt = (ts - state.last) / 1000;
+    if(dt > 0.05) dt = 0.05;
+    if(dt < 0) dt = 0;
+    state.last = ts;
+
+    if(isEditing() || (lb && lb.classList.contains('open'))){ stopLoop(); return; }
+
+    const d = state.speed * dt;
+
+    // Vertical scroll always on stage
+    const maxY = Math.max(0, stage.scrollHeight - stage.clientHeight);
+    if(state.mode === 'down'){
+      state.accY = (state.accY + d) % (maxY || 1);
+      stage.scrollTop = state.accY;
+    } else if(state.mode === 'up'){
+      state.accY = (state.accY - d);
+      if(maxY > 0){
+        while(state.accY < 0) state.accY += maxY;
+        stage.scrollTop = state.accY;
+      } else {
+        stage.scrollTop = 0;
+      }
+    } else if(state.mode === 'left'){
+      // Horizontal scroll: pick correct container (grid in filmstrip mode)
+      const target = horizTarget();
+      const maxX = Math.max(0, target.scrollWidth - target.clientWidth);
+      state.accX = (state.accX - d);
+      if(maxX > 0){
+        while(state.accX < 0) state.accX += maxX;
+        target.scrollLeft = state.accX;
+      } else {
+        target.scrollLeft = 0;
+      }
+    } else if(state.mode === 'right'){
+      const target = horizTarget();
+      const maxX = Math.max(0, target.scrollWidth - target.clientWidth);
+      state.accX = (state.accX + d);
+      if(maxX > 0){
+        state.accX = state.accX % maxX;
+        target.scrollLeft = state.accX;
+      } else {
+        target.scrollLeft = 0;
+      }
+    }
+
+    state.raf = requestAnimationFrame(step);
+  }
+
+  function start(mode){
+    state.mode = mode; state.last = 0;
+    // Initialize accumulators from current scroll
+    state.accX = horizTarget().scrollLeft;
+    state.accY = stage.scrollTop;
+    ssBtn.classList.add('active');
+    if(state.raf) cancelAnimationFrame(state.raf);
+    try{ stage.style.scrollBehavior = 'auto'; horizTarget().style.scrollBehavior = 'auto'; }catch(_){}
+    state.raf = requestAnimationFrame(step);
+  }
+
+  ssMenu.addEventListener('click', (e)=>{
+    const b = e.target.closest('button[data-ss]'); if(!b) return;
+    const mode = b.getAttribute('data-ss'); closeMenu();
+    if(mode === 'stop'){ stopLoop(); return; }
+    start(mode);
+  });
+
+  // Stop on user interaction or resize
+  ['wheel','pointerdown','keydown','touchstart'].forEach(evt=>{
+    stage.addEventListener(evt, ()=>{ if(state.mode) stopLoop(); }, { passive:true });
+    gridEl.addEventListener(evt, ()=>{ if(state.mode) stopLoop(); }, { passive:true });
+  });
+  window.addEventListener('resize', ()=>{ if(state.mode) stopLoop(); });
+})();</script><!-- CAPTION_ACTIVATOR -->
+<script>
+// Activate caption hit zone whenever the lightbox opens and media/layout settle
+(function(){
+  const lb = document.getElementById('lightbox') || document.querySelector('.lightbox');
+  if(!lb) return;
+  const lbShell = document.getElementById('lbShell') || lb.querySelector('.lb-shell') || lb;
+  const captionHit = document.getElementById('captionHit') || lb.querySelector('#captionHit, .caption-hit');
+
+  function safe(fn){ try{ fn && fn(); }catch(_){} }
+
+  function settleCaptionLayout(){
+    // Re-activate the hit zone
+    if(captionHit){
+      captionHit.hidden = false;
+      captionHit.style.display = '';
+      captionHit.style.pointerEvents = 'auto';
+      // Clear any collapsed inline sizes/positions set on close
+      captionHit.style.width = '';
+      captionHit.style.height = '';
+      captionHit.style.left = '';
+      captionHit.style.top = '';
+    }
+    // Recompute geometry using existing helpers if present
+    safe(()=> window.measureAndSetCaptionSpace && window.measureAndSetCaptionSpace());
+    safe(()=> window.updateCaptionHitZone && window.updateCaptionHitZone());
+    safe(()=> window.applyComboShift && window.applyComboShift());
+    safe(()=> window.fitControls && window.fitControls());
+  }
+
+  // Wrap openLB if it exists to settle right after opening
+  try{
+    const oldOpen = window.openLB;
+    if(typeof oldOpen === 'function'){
+      window.openLB = function(){
+        const out = oldOpen.apply(this, arguments);
+        requestAnimationFrame(settleCaptionLayout);
+        return out;
+      };
+    }
+  }catch(_){}
+
+  // Observe 'open' class changes in case opening happens outside openLB()
+  try{
+    const mo = new MutationObserver(()=>{
+      if(lb.classList.contains('open')){
+        requestAnimationFrame(settleCaptionLayout);
+      }
+    });
+    mo.observe(lb, { attributes: true, attributeFilter: ['class'] });
+  }catch(_){}
+
+  // Re-settle when media inside the lightbox becomes ready
+  lb.addEventListener('load',            ()=> settleCaptionLayout(), true);
+  lb.addEventListener('loadeddata',      ()=> settleCaptionLayout(), true);
+  lb.addEventListener('loadedmetadata',  ()=> settleCaptionLayout(), true);
+
+  // Also re-settle on window resize while lightbox is open
+  window.addEventListener('resize', ()=>{ if(lb.classList.contains('open')) settleCaptionLayout(); });
+
+})();
 </script>
 
 </body>
