@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Lightbox I/O</title>
+<title>Museum‑Grade Photo &amp; Video UI — v1.10.4 (drop‑box reorder &amp; sequence index)</title>
 <style>
   :root{
     --bg:#0f1115; --stroke:rgba(255,255,255,.18); --text:rgba(255,255,255,.88);
@@ -28,7 +28,18 @@
       linear-gradient(180deg,#0b0d12,#0f1115);
   }
   .wrap{display:grid;grid-template-columns:420px 1fr;gap:28px;min-height:100vh;padding:28px}
-  .panel{padding:22px;border-radius:var(--radius);background:rgba(255,255,255,.05);border:1px solid var(--stroke);text-align:center}
+  .panel {
+  padding:22px;
+  border-radius:var(--radius);
+  border:1px solid var(--stroke);
+  text-align:center;
+  /* Solid dark base + layered gradients for texture */
+  background:
+    radial-gradient(800px 600px at 80% 0%, rgba(215,194,159,.08), transparent 60%),
+    radial-gradient(600px 400px at 10% 100%, rgba(255,240,220,.06), transparent 60%),
+    linear-gradient(180deg, #13161c, #0f1115);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 12px 40px rgba(0,0,0,.35);
+}
   .panel h1{margin:0 0 10px;font-size:18px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
   .row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:8px 0}
   .btn,.chip{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;border:1px solid var(--stroke);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer;user-select:none;text-decoration:none}
@@ -476,13 +487,108 @@ background: #0f1115;
 #captionHit{ pointer-events:auto; }
 .lightbox:not(.open) #captionHit{ display:none !important; pointer-events:none !important; }
 
+
+/* ===== Fold/Expand for left panel ===== */
+.app, .root, body { --panel-w: 320px; --panel-w-min: 14px; --panel-pad: 14px; }
+.panel{
+  position: relative;
+  width: var(--panel-w);
+  min-width: var(--panel-w);
+  transition: width .24s cubic-bezier(.22,.61,.36,1), min-width .24s cubic-bezier(.22,.61,.36,1);
+  overflow: visible; /* so handle can sit on edge */
+}
+/* Collapsed state: content clipped; keep a slim gutter for the handle */
+.panel.collapsed{
+  width: var(--panel-w-min);
+  min-width: var(--panel-w-min);
+  padding-left: 0; padding-right: 0;
+}
+.panel .panel-inner{ transition: opacity .18s ease; }
+.panel.collapsed .panel-inner{ opacity: 0; pointer-events: none; }
+
+/* The fold handle: minimalistic vertical lines along Y-axis on the panel's right edge */
+.panel-fold-handle{
+  position: absolute;
+  top: 0; right: -6px;
+  width: 16px; height: 100%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10;
+}
+.panel-fold-handle::before{
+  content:"";
+  display:block;
+  width: 8px; height: 46px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.24) 1px, transparent 1px) left 0/4px 100% repeat-x,
+    linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  border-radius: 8px;
+}
+/* Ensure main layout uses two columns so stage expands when panel collapses */
+.main{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+}
+
+
+
+/* --- Fold handle visibility & placement fix --- */
+.panel{ position: relative; overflow: visible; }
+.panel-fold-handle{
+  position:absolute; top:0; right:0;
+  width:16px; height:100%;
+  cursor:pointer; z-index:100;
+  display:flex; align-items:center; justify-content:center;
+}
+.panel-fold-handle::before{
+  content:""; display:block;
+  width:8px; height:72px;
+  border-radius:8px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.28), rgba(255,255,255,.28)) 0 0/1px 100% no-repeat,
+    linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.18)) 4px 0/1px 100% no-repeat,
+    linear-gradient(90deg, rgba(255,255,255,.10), rgba(255,255,255,.10)) 8px 0/1px 100% no-repeat;
+  box-shadow: 0 10px 24px rgba(0,0,0,.35);
+}
+
+/* === Sidebar panel + centered content when folded === */
+:root{
+  --fold: 0; /* 0 open, 1 folded */
+  --sidebar-now: calc(var(--panel-w-min) + (var(--panel-w) - var(--panel-w-min)) * (1 - var(--fold)));
+}
+/* Make left panel a fixed sidebar */
+.panel{
+  position: fixed; left: 0; top: 0; height: 100vh;
+  width: var(--sidebar-now); min-width: var(--sidebar-now);
+  transition: none !important; z-index: 50;
+}
+.panel .panel-inner{ opacity: calc(1 - var(--fold)); transition: opacity .18s ease; }
+.panel.collapsed .panel-inner{ pointer-events: none; }
+/* Content wrapper takes sidebar width as padding so it never sits under it */
+.wrap{
+  padding-left: var(--sidebar-now);
+  transition: none !important;
+  display: block;
+}
+/* Center the stage/grid within the viewport; it will naturally slide as padding-left shrinks */
+.stage{ max-width: 1600px; margin: 0 auto; }
+/* Width-only scale for subtle proportional feel during folding */
+.grid{
+  transform-origin: center;
+  transform: scaleX(calc(0.97 + 0.03 * var(--fold)));
+  will-change: transform;
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
-<section class="panel">
-<h1>Impression Controls</h1>
-<div class="panel-controls">
+<section class="panel"><div class="panel-fold-handle" title="Fold / Expand"></div>
+
+
+<div class="panel-inner"><h1>Impression Controls</h1><div class="panel-controls">
 <div class="controls-dial">
 <div class="dial" id="dial"><div class="needle" id="needle"></div></div>
 <div class="label"><span id="moodLabel">Impression • 0% (Greyscale)</span></div>
@@ -505,9 +611,22 @@ background: #0f1115;
 <label>Layouts</label>
 <div class="chip" id="layoutBtn"><span class="dot"></span> Layouts</div>
 </div><div class="row"><label>Slide Show</label><div class="chip" id="slideshowBtn"><span class="dot"></span> Slideshow</div></div>
+<div class="row">
+  <label>Project</label>
+  <div class="chip" id="saveBtn"><span class="dot"></span> Save</div>
 </div>
+<div class="row">
+  <label>Load</label>
+  <div class="chip" id="loadBtn"><span class="dot"></span> Load</div>
+  <input id="loadInput" type="file" accept="application/json" hidden>
 </div>
-</section>
+<div class="row">
+  <label>Media Root</label>
+  <div class="chip" id="linkFolderBtn"><span class="dot"></span> Link folder…</div>
+</div>
+
+</div>
+</div></div></section>
 <section class="stage" id="stage">
 <div class="grid" id="grid">
 <!-- Seed tiles -->
@@ -524,7 +643,7 @@ background: #0f1115;
 <button aria-label="Close" class="lb-btn lb-close ah" id="lbClose">✕</button>
 <button aria-label="Previous" class="lb-btn lb-prev ah" id="lbPrev">‹</button>
 <div class="media-wrap" id="mediaWrap">
-<img alt="Expanded media" class="media" id="lbImage">
+<img alt="Expanded media" class="media" id="lbImage"/>
 <video class="media" id="lbVideo" loop="" muted="" playsinline=""></video>
 <!-- Bottom-Centered Controls (video-only) -->
 <div class="controls" id="controls">
@@ -549,11 +668,11 @@ background: #0f1115;
 <button class="pin" id="captionPin" title="Pin panel">Pin</button>
 </div>
 <div class="caption-meta" id="captionMeta">—</div>
-<input class="caption-input" id="captionTitle" placeholder="Title (optional)">
+<input class="caption-input" id="captionTitle" placeholder="Title (optional)"/>
 <textarea class="caption-text" id="captionText" placeholder="Write notes or a description..."></textarea>
 <button class="btn caption-save" id="captionSave"><span class="dot"></span> Save</button>
-</input></div>
-</img></div>
+</div>
+</div>
 <div aria-hidden="true" class="caption-hit" id="captionHit"></div>
 <button aria-label="Next" class="lb-btn lb-next ah" id="lbNext">›</button>
 </div>
@@ -810,13 +929,32 @@ if(!dragging) return;
     cSeek.value = d? Math.round(ct/d*1000) : 0;
   }
   function applyCaptionFor(src, meta=''){
-    const saved = captions.get(src) || {title:'', text:''};
+    // Resolve a stable key based on the media node's dataset when possible
+    function stableKeyForSrc(srcUrl){
+      try{
+        const nodes = [...document.querySelectorAll('.tile img, .tile video')];
+        const n = nodes.find(el => (el.currentSrc||el.src) === srcUrl);
+        if(n){ return n.dataset.key || n.dataset.relPath || n.dataset.localName || srcUrl; }
+      }catch(_){}
+      return srcUrl;
+    }
+    const key = stableKeyForSrc(src);
+    const saved = captions.get(key) || {title:'', text:''};
     captionTitle.value = saved.title;
-    captionText.value = saved.text;
+    captionText.value  = saved.text;
     captionMeta.textContent = meta;
   }
   function saveCaptionFor(src){
-    captions.set(src,{title:captionTitle.value.trim(), text:captionText.value.trim()});
+    function stableKeyForSrc(srcUrl){
+      try{
+        const nodes = [...document.querySelectorAll('.tile img, .tile video')];
+        const n = nodes.find(el => (el.currentSrc||el.src) === srcUrl);
+        if(n){ return n.dataset.key || n.dataset.relPath || n.dataset.localName || srcUrl; }
+      }catch(_){}
+      return srcUrl;
+    }
+    const key = stableKeyForSrc(src);
+    captions.set(key, { title: captionTitle.value.trim(), text: captionText.value.trim() });
   }
 
   function isPortrait(){ return window.innerHeight > window.innerWidth; }
@@ -887,9 +1025,9 @@ if(!dragging) return;
 
   // Lightbox media switching (order-aware)
   let idx=0, media=[], captionPinned=false;
-  const captions = new Map();
-
-  function computeMediaList(){ return [...grid.querySelectorAll('.tile img,.tile video')]; }
+  const captions = (window.captions instanceof Map) ? window.captions : new Map();
+  window.captions = captions;
+function computeMediaList(){ return [...grid.querySelectorAll('.tile img,.tile video')]; }
   function showInLightbox(node){
     updateOrientationClass();
     if(!captionPinned) captionPanel.classList.remove('visible');
@@ -1061,7 +1199,26 @@ if(!dragging) return;
     setTimeout(()=>captionSave.classList.remove('active'), 600);
   });
 
-  // ===== Uploads =====
+  
+  // Auto-save on blur/input (debounced)
+  ;(function(){
+    let t = null;
+    function doSave(){
+      const node = computeMediaList()[idx];
+      if(!node) return;
+      const key = node.currentSrc||node.src;
+      saveCaptionFor(key);
+    }
+    function debounced(){
+      if(t) clearTimeout(t);
+      t = setTimeout(doSave, 300);
+    }
+    captionTitle.addEventListener('blur', doSave);
+    captionText.addEventListener('blur', doSave);
+    captionTitle.addEventListener('input', debounced);
+    captionText.addEventListener('input', debounced);
+  })();
+// ===== Uploads =====
   const fileInput=document.getElementById('fileInput');
   fileInput.addEventListener('change',e=>{ handleFiles(e.target.files); e.target.value=''; });
 
@@ -1080,6 +1237,15 @@ if(!dragging) return;
     const tile=document.createElement('div'); tile.className='tile';
     tile.innerHTML='<div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div>';
     const img=document.createElement('img'); img.src=url; img.alt='';
+    // Infer name from URL and assign stable uid key
+    const clean = (url||'').split('?')[0].split('#')[0];
+    const base = clean.split('/').pop() || '';
+    const uid = 'uid:' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    img.dataset.srcType = clean.startsWith('blob:') ? 'local' : 'url';
+    img.dataset.localName = base;
+    img.dataset.relPath = base;
+    img.dataset.key = uid;
+    tile.dataset.key = uid;
     tile.appendChild(img); appendTile(tile);
   }
   function addVideoFromURL(url){
@@ -1087,9 +1253,42 @@ if(!dragging) return;
     tile.innerHTML='<div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div>';
     const vid=document.createElement('video');
     vid.src=url; vid.muted=true; vid.loop=true; vid.playsInline=true; vid.preload='metadata';
+    const clean = (url||'').split('?')[0].split('#')[0];
+    const base = clean.split('/').pop() || '';
+    const uid = 'uid:' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    vid.dataset.srcType = clean.startsWith('blob:') ? 'local' : 'url';
+    vid.dataset.localName = base;
+    vid.dataset.relPath = base;
+    vid.dataset.key = uid;
+    tile.dataset.key = uid;
     tile.appendChild(vid); appendTile(tile);
   }
-  function handleFiles(files){
+  
+  function addImageFromFile(file){
+    const tile=document.createElement('div'); tile.className='tile';
+    tile.innerHTML='<div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div>';
+    const img=document.createElement('img'); img.alt='';
+    img.src = URL.createObjectURL(file);
+    const uid = 'uid:' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    img.dataset.srcType = 'local';
+    img.dataset.localName = file.name || '';
+    img.dataset.relPath = (file.webkitRelativePath || file.name || '');
+    img.dataset.key = uid; tile.dataset.key = uid;
+    tile.appendChild(img); appendTile(tile);
+  }
+  function addVideoFromFile(file){
+    const tile=document.createElement('div'); tile.className='tile';
+    tile.innerHTML='<div class="tools"><button class="tool tool-del" title="Remove">✕</button><button class="tool tool-s1" title="Small">S</button><button class="tool tool-s2" title="Large">L</button><button class="tool tool-s3" title="Extra Large">XL</button></div>';
+    const vid=document.createElement('video'); vid.muted=true; vid.loop=true; vid.playsInline=true; vid.preload='metadata';
+    vid.src = URL.createObjectURL(file);
+    const uid = 'uid:' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    vid.dataset.srcType = 'local';
+    vid.dataset.localName = file.name || '';
+    vid.dataset.relPath = (file.webkitRelativePath || file.name || '');
+    vid.dataset.key = uid; tile.dataset.key = uid;
+    tile.appendChild(vid); appendTile(tile);
+  }
+function handleFiles(files){
     if(!files || !files.length) return;
     [...files].forEach(f=>{
       const url=URL.createObjectURL(f);
@@ -1810,8 +2009,8 @@ videoCtx.addEventListener('click', (e)=>{
 <button data-layout="reset-sizes">Reset Sizes</button>
 <button data-layout="reset-all">Reset All</button>
 </div>
-</div><div class="menu-popover" hidden id="slideshowMenu"><h3>Slide Direction</h3><div class="row"><button data-ss="down">Auto Scroll Down</button><button data-ss="up">Auto Scroll Up</button><button data-ss="left">Auto Scroll Left</button>
-      <button data-ss="right">Auto Scroll Right</button></div><div class="row"><button data-ss="stop">Stop</button></div></div>
+</div><div class="menu-popover" hidden="" id="slideshowMenu"><h3>Slide Direction</h3><div class="row"><button data-ss="down">Auto Scroll Down</button><button data-ss="up">Auto Scroll Up</button><button data-ss="left">Auto Scroll Left</button>
+<button data-ss="right">Auto Scroll Right</button></div><div class="row"><button data-ss="stop">Stop</button></div></div>
 <!-- Tile context menu -->
 <div class="tile-ctx" hidden="" id="tileCtx">
 <button id="ctxEdit">Edit</button>
@@ -1924,7 +2123,6 @@ document.addEventListener('DOMContentLoaded', function(){
   }catch(_){}
 });
 </script>
-
 <script>
   // --- Activate caption hit zone when the lightbox opens ---
   (function ensureCaptionHitActivation(){
@@ -1981,8 +2179,7 @@ document.addEventListener('DOMContentLoaded', function(){
     // 4) Also re-settle on resize (orientation / caption size changes)
     window.addEventListener('resize', ()=> lb.classList.contains('open') && settleCaptionLayout());
   })();
-  </script>  
-
+  </script>
 <script>
 // === Slideshow (auto-scroll) ===
 (function(){
@@ -2102,67 +2299,486 @@ document.addEventListener('DOMContentLoaded', function(){
     gridEl.addEventListener(evt, ()=>{ if(state.mode) stopLoop(); }, { passive:true });
   });
   window.addEventListener('resize', ()=>{ if(state.mode) stopLoop(); });
-})();</script><!-- CAPTION_ACTIVATOR -->
+})();</script>
 <script>
-// Activate caption hit zone whenever the lightbox opens and media/layout settle
-(function(){
-  const lb = document.getElementById('lightbox') || document.querySelector('.lightbox');
-  if(!lb) return;
-  const lbShell = document.getElementById('lbShell') || lb.querySelector('.lb-shell') || lb;
-  const captionHit = document.getElementById('captionHit') || lb.querySelector('#captionHit, .caption-hit');
+// Fold/Expand left panel via minimalistic handle
+document.addEventListener('DOMContentLoaded', function(){
+  const panel = document.querySelector('.panel');
+  if(!panel) return;
+  const handle = panel.querySelector('.panel-fold-handle');
+  if(!handle) return;
 
-  function safe(fn){ try{ fn && fn(); }catch(_){} }
+  // Restore last state
+  try{
+    const saved = localStorage.getItem('panel.collapsed');
+    if(saved === '1'){ panel.classList.add('collapsed'); }
+  }catch(_){}
 
-  function settleCaptionLayout(){
-    // Re-activate the hit zone
-    if(captionHit){
-      captionHit.hidden = false;
-      captionHit.style.display = '';
-      captionHit.style.pointerEvents = 'auto';
-      // Clear any collapsed inline sizes/positions set on close
-      captionHit.style.width = '';
-      captionHit.style.height = '';
-      captionHit.style.left = '';
-      captionHit.style.top = '';
-    }
-    // Recompute geometry using existing helpers if present
-    safe(()=> window.measureAndSetCaptionSpace && window.measureAndSetCaptionSpace());
-    safe(()=> window.updateCaptionHitZone && window.updateCaptionHitZone());
-    safe(()=> window.applyComboShift && window.applyComboShift());
-    safe(()=> window.fitControls && window.fitControls());
+  function togglePanel(){
+    panel.classList.toggle('collapsed');
+    try{ localStorage.setItem('panel.collapsed', panel.classList.contains('collapsed') ? '1':'0'); }catch(_){}
+    // Refresh layout-dependent logic after transition
+    setTimeout(()=>{
+      try{
+        if(typeof updateCaptionHitZone === 'function') updateCaptionHitZone();
+        if(typeof fitControls === 'function') fitControls();
+      }catch(_){}
+    }, 280);
   }
 
-  // Wrap openLB if it exists to settle right after opening
+  handle.addEventListener('click', (e)=>{ e.preventDefault(); togglePanel(); });
+  handle.tabIndex = 0;
+  handle.setAttribute('role','button');
+  handle.setAttribute('aria-label','Fold or expand controls panel');
+  handle.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); togglePanel(); }
+  });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const root = document.documentElement;
+  const panel = document.querySelector('.panel');
+  if(!panel) return;
+  let handle = panel.querySelector('.panel-fold-handle');
+  if(!handle) return;
+
+  // Remove old listeners by cloning handle
+  const fresh = handle.cloneNode(true);
+  handle.parentNode.replaceChild(fresh, handle);
+  handle = fresh;
+
+  // Restore state
   try{
-    const oldOpen = window.openLB;
-    if(typeof oldOpen === 'function'){
-      window.openLB = function(){
-        const out = oldOpen.apply(this, arguments);
-        requestAnimationFrame(settleCaptionLayout);
-        return out;
-      };
-    }
+    const saved = localStorage.getItem('panel.collapsed');
+    if(saved === '1'){ root.style.setProperty('--fold','1'); panel.classList.add('collapsed'); }
+    else { root.style.setProperty('--fold','0'); panel.classList.remove('collapsed'); }
   }catch(_){}
 
-  // Observe 'open' class changes in case opening happens outside openLB()
-  try{
-    const mo = new MutationObserver(()=>{
-      if(lb.classList.contains('open')){
-        requestAnimationFrame(settleCaptionLayout);
+  let raf = 0;
+  const DURATION = 800; // ms
+  const easeOutQuint = t => 1 - Math.pow(1 - t, 5);
+
+  function animateFold(toCollapsed){
+    if(raf) cancelAnimationFrame(raf);
+    const start = parseFloat(getComputedStyle(root).getPropertyValue('--fold')) || 0;
+    const end = toCollapsed ? 1 : 0;
+    const t0 = performance.now();
+    function frame(now){
+      const p = Math.min(1, (now - t0)/DURATION);
+      const e = easeOutQuint(p);
+      const val = start + (end - start) * e;
+      root.style.setProperty('--fold', val.toFixed(4));
+      if(p < 1){
+        raf = requestAnimationFrame(frame);
+      }else{
+        root.style.setProperty('--fold', String(end));
+        panel.classList.toggle('collapsed', end === 1);
+        try{ localStorage.setItem('panel.collapsed', end === 1 ? '1' : '0'); }catch(_){}
+        // Refresh layout after settle
+        try{ if(typeof updateCaptionHitZone === 'function') updateCaptionHitZone(); }catch(_){}
+        try{ if(typeof fitControls === 'function') fitControls(); }catch(_){}
+        raf = 0;
+      }
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  function togglePanel(){
+    const curr = parseFloat(getComputedStyle(root).getPropertyValue('--fold')) || 0;
+    animateFold(!(curr > 0.5));
+  }
+
+  handle.addEventListener('click', e => { e.preventDefault(); togglePanel(); });
+  handle.tabIndex = 0;
+  handle.setAttribute('role','button');
+  handle.setAttribute('aria-label','Fold or expand controls panel');
+  handle.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); togglePanel(); }
+  });
+
+  // Re-apply layout measurers on resize
+  let tick = 0;
+  window.addEventListener('resize', ()=>{
+    if(tick) cancelAnimationFrame(tick);
+    tick = requestAnimationFrame(()=>{
+      try{ if(typeof updateCaptionHitZone === 'function') updateCaptionHitZone(); }catch(_){}
+      try{ if(typeof fitControls === 'function') fitControls(); }catch(_){}
+    });
+  });
+});
+</script>
+
+
+<script>
+// ===== Robust Save / Load + Local Folder + Layout + Video Thumbs + Caption Hit Zone =====
+document.addEventListener('DOMContentLoaded', function(){
+  const grid = document.querySelector('.grid') || document.getElementById('grid');
+  let captions = (window.captions instanceof Map) ? window.captions : new Map();
+  window.captions = captions;
+
+  const saveBtn = document.getElementById('saveBtn');
+  const loadBtn = document.getElementById('loadBtn');
+  const loadInput = document.getElementById('loadInput');
+  const linkFolderBtn = document.getElementById('linkFolderBtn');
+
+  window.mediaRootHandle = window.mediaRootHandle || null;
+  window.pendingImportData = null;
+  window.currentLayoutKind = window.currentLayoutKind || 'masonry';
+
+  function readCSSVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+  // grid variant helpers (cols/filmstrip)
+  function gridVariant(){
+    if (!grid) return 'auto';
+    const cls = grid.classList;
+    if (cls.contains('filmstrip')) return 'filmstrip';
+    if (cls.contains('cols-4')) return 'cols-4';
+    if (cls.contains('cols-3')) return 'cols-3';
+    if (cls.contains('cols-2')) return 'cols-2';
+    return 'auto';
+  }
+  function setGridVariant(v){
+    if (!grid) return;
+    grid.classList.remove('cols-2','cols-3','cols-4','filmstrip');
+    if (v && v !== 'auto') grid.classList.add(v);
+  }
+
+  // hook into existing applyLayout(kind) if present, record currentLayoutKind
+  if (typeof window.applyLayout === 'function'){
+    const origApply = window.applyLayout;
+    window.applyLayout = function(kind){
+      window.currentLayoutKind = kind || 'masonry';
+      return origApply(kind);
+    }
+  }
+
+  // Delegated context menu for aspect ratio on videos (fallback)
+  grid?.addEventListener('contextmenu', (e)=>{
+    const vid = e.target && e.target.closest ? e.target.closest('video') : null;
+    if (!vid) return;
+    if (typeof window.showAspectMenu === 'function'){
+      e.preventDefault();
+      window.showAspectMenu(vid, e.clientX, e.clientY);
+    }
+  });
+
+  // Ensure caption functions use a stable key (relPath -> localName -> data-key -> src)
+  (function(){
+    try{
+      const origApply = window.applyCaptionFor;
+      const origSave  = window.saveCaptionFor;
+      function stableKeyForSrc(src){
+        try{
+          const nodes = [...document.querySelectorAll('.tile img, .tile video')];
+          const n = nodes.find(el => (el.currentSrc||el.src) === src);
+          if (n){ return n.dataset.relPath || n.dataset.localName || n.dataset.key || src; }
+        }catch(_){}
+        return src;
+      }
+      window.applyCaptionFor = function(src, meta=''){
+        const key = stableKeyForSrc(src);
+        const saved = captions.get(key) || {title:'', text:''};
+        const titleEl = document.getElementById('captionTitle') || window.captionTitle;
+        const textEl = document.getElementById('captionText') || window.captionText;
+        const metaEl = document.getElementById('captionMeta') || window.captionMeta;
+        if (titleEl) titleEl.value = saved.title || '';
+        if (textEl) textEl.value = saved.text || '';
+        if (metaEl) metaEl.textContent = meta || '';
+      };
+      window.saveCaptionFor = function(src){
+        const key = stableKeyForSrc(src);
+        const titleEl = document.getElementById('captionTitle') || window.captionTitle;
+        const textEl = document.getElementById('captionText') || window.captionText;
+        captions.set(key,{ title: (titleEl?.value||'').trim(), text: (textEl?.value||'').trim() });
+      };
+    }catch(err){ console.warn('Caption stabilizer failed:', err); }
+  })();
+
+  // Caption hit zone refresher when lightbox opens (using MutationObserver on class change)
+  (function(){
+    const lb = document.getElementById('lightbox');
+    if (!lb) return;
+    const obs = new MutationObserver(()=>{
+      const open = lb.classList.contains('open') || lb.style.display === 'block';
+      if (open){
+        // Refresh any geometry/pointer-events the caption sidebar relies on
+        const handle = lb.querySelector('.caption-handle');
+        const panel = lb.querySelector('.caption-panel, .caption');
+        if (handle){ handle.style.pointerEvents = 'auto'; handle.style.zIndex = 1001; }
+        if (panel){ panel.style.pointerEvents = 'auto'; panel.style.zIndex = 1000; }
       }
     });
-    mo.observe(lb, { attributes: true, attributeFilter: ['class'] });
-  }catch(_){}
+    obs.observe(lb, { attributes:true, attributeFilter:['class','style'] });
+  })();
 
-  // Re-settle when media inside the lightbox becomes ready
-  lb.addEventListener('load',            ()=> settleCaptionLayout(), true);
-  lb.addEventListener('loadeddata',      ()=> settleCaptionLayout(), true);
-  lb.addEventListener('loadedmetadata',  ()=> settleCaptionLayout(), true);
+  // Helpers
+  function tiles(){ return Array.from(grid?.querySelectorAll('.tile') || []); }
+  function ensureTools(tile){
+    if (!tile.querySelector('.tools')){
+      tile.insertAdjacentHTML('afterbegin', `
+        <span class="seq-badge"></span>
+        <div class="tools">
+          <button class="tool tool-del" title="Remove">✕</button>
+          <button class="tool tool-s1" title="Small">S</button>
+          <button class="tool tool-s2" title="Large">L</button>
+          <button class="tool tool-s3" title="Extra Large">XL</button>
+        </div>
+      `);
+    }
+  }
+  function updateSeqBadges(){
+    tiles().forEach((t,i)=>{ const b=t.querySelector('.seq-badge'); if(b) b.textContent=i; });
+  }
 
-  // Also re-settle on window resize while lightbox is open
-  window.addEventListener('resize', ()=>{ if(lb.classList.contains('open')) settleCaptionLayout(); });
+  // Serialize board
+  function serializeTiles(){
+    const out = [];
+    tiles().forEach((t, i)=>{
+      const el = t.querySelector('img,video'); if(!el) return;
+      const isVideo = el.tagName.toLowerCase()==='video';
+      const src = (el.dataset && el.dataset.origSrc) ? el.dataset.origSrc : (el.currentSrc || el.src);
+      const key = (el.dataset && (el.dataset.key || el.dataset.relPath)) ? (el.dataset.key || el.dataset.relPath) : src;
+      const cap = (typeof captions !== 'undefined' && captions instanceof Map) ? (captions.get(key) || {title:'', text:''}) : {title:'', text:''};
+      const srcType = (el.dataset && el.dataset.srcType) ? el.dataset.srcType : (src && src.startsWith('blob:') ? 'local' : 'url');
+      const localName = el.dataset?.localName || '';
+      const relPath = el.dataset?.relPath || localName;
+      const tileAR = t.style?.aspectRatio || '';
+      const arOverride = t.dataset?.arOverride || '';
+      const fit = t.dataset?.fit || (t.classList.contains('fitw') ? 'fitw' : (el.style?.objectFit || ''));
+      const thumbTime = el.dataset?.thumbTime ? Number(el.dataset.thumbTime) : (isVideo ? 0.05 : 0);
+      let size = 'normal'; if (t.classList.contains('size-3')) size='size-3'; else if (t.classList.contains('size-2')) size='size-2';
+      out.push({  seq:i, kind:isVideo?'video':'image', src, size, srcType, localName, relPath, key, tileAR, arOverride, fit, thumbTime , title: cap.title || '', description: cap.text || '' });
+    });
+    return out;
+  }
+  function exportBoardData(){
+    return {
+      version: '1.2',
+      savedAt: new Date().toISOString(),
+      layout: {
+        template: window.currentLayoutKind || 'masonry',
+        gridVariant: gridVariant(),
+        gray: readCSSVar('--gray') || '1',
+        blur: readCSSVar('--blur') || '0px'
+      },
+      tiles: serializeTiles(),
+      captions: Object.fromEntries(captions)
+    };
+  }
 
-})();
+  function downloadJSON(filename, dataObj){
+    const blob = new Blob([JSON.stringify(dataObj, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
+  }
+
+  // Save
+  saveBtn?.addEventListener('click', ()=>{
+    downloadJSON('media-board.json', exportBoardData());
+    saveBtn.classList.add('active'); setTimeout(()=>saveBtn.classList.remove('active'), 600);
+  });
+
+  // Link folder (user gesture)
+  linkFolderBtn?.addEventListener('click', async ()=>{
+    if (!('showDirectoryPicker' in window)) { alert('This browser does not support folder access.'); return; }
+    try{
+      window.mediaRootHandle = await window.showDirectoryPicker({ id: 'media-root', mode: 'read' });
+      linkFolderBtn.classList.add('active'); setTimeout(()=>linkFolderBtn.classList.remove('active'), 600);
+      if (window.pendingImportData){ const data = window.pendingImportData; window.pendingImportData = null; await importBoardData(data); }
+    }catch(err){ console.warn('Folder not chosen', err); }
+  });
+
+  // Load
+  loadBtn?.addEventListener('click', ()=> loadInput?.click());
+  loadInput?.addEventListener('change', async (e)=>{
+    const file = e.target.files?.[0]; e.target.value = ''; if(!file) return;
+    try{
+      const data = JSON.parse(await file.text());
+      const needsLocal = Array.isArray(data.tiles) && data.tiles.some(t => (t.srcType||'')==='local');
+      if (needsLocal && !window.mediaRootHandle){
+        window.pendingImportData = data;
+        alert('This project references local files. Click "Link folder…" in the sidebar to select your media root, then the import will continue.');
+      } else {
+        await importBoardData(data);
+        loadBtn.classList.add('active'); setTimeout(()=>loadBtn.classList.remove('active'), 600);
+      }
+    }catch(err){
+      console.error('Load failed:', err);
+      alert('Failed to load project. Is this a valid JSON export?');
+    }
+  });
+
+  async function importBoardData(data){
+    if(!data || !Array.isArray(data.tiles)) throw new Error('Invalid data');
+
+    // Apply layout template and grid variant
+    const template = data.layout?.template || 'masonry';
+    const variant = data.layout?.gridVariant || 'auto';
+    setGridVariant(variant);
+    if (typeof window.applyLayout === 'function'){
+      try{ window.applyLayout(template); 
+    // === Restore captions map from JSON ===
+    try{
+      if (data.captions && typeof data.captions === 'object'){
+        // Clear existing entries to avoid stale keys
+        try{ captions.clear(); }catch(_){ captions = new Map(); }
+        Object.entries(data.captions).forEach(([k,v])=>{
+          if (v && typeof v === 'object'){
+            const mapped = (window.__captionKeyMap && window.__captionKeyMap[k]) ? window.__captionKeyMap[k] : k;
+            captions.set(mapped, { title: (v.title||''), text: (v.text||'') });
+          }
+        });
+        window.captions = captions;
+      }
+    }catch(err){ console.warn('Caption import failed:', err); }
+}catch(err){ console.warn('applyLayout failed', err); }
+    } else {
+      // Fallback: cols variants already applied; for hero/checker we can't reconstruct precisely without applyLayout.
+    }
+    if (data.layout?.gray != null) document.documentElement.style.setProperty('--gray', String(data.layout.gray));
+    if (data.layout?.blur != null) document.documentElement.style.setProperty('--blur', String(data.layout.blur));
+
+    // Clear grid
+    if (grid) grid.innerHTML = '';
+
+    // Local file resolver
+    const needsLocal = data.tiles.some(t => (t.srcType||'') === 'local');
+    const rootDirHandle = window.mediaRootHandle || null;
+    async function getFileFromRelPath(relPath){
+      if (!rootDirHandle || !relPath) return null;
+      const parts = relPath.split('/').filter(Boolean);
+      let dir = rootDirHandle;
+      for (let i = 0; i < parts.length - 1; i++){
+        try{ dir = await dir.getDirectoryHandle(parts[i], { create:false }); }catch(_){ return null; }
+      }
+      const fileName = parts[parts.length - 1];
+      try{ const fh = await dir.getFileHandle(fileName, { create:false }); return await fh.getFile(); }catch(_){ return null; }
+    }
+
+    for (const t of data.tiles){
+      const tile = document.createElement('div'); tile.className = 'tile';
+      const origKey = (t.key || t.relPath || t.localName || t.src || (t.kind + ':' + Math.random().toString(36).slice(2)));
+      const stableKey = (typeof t.key === 'string' && t.key.startsWith('uid:')) ? t.key : ('uid:' + Math.random().toString(36).slice(2) + Date.now().toString(36));
+      // Map legacy keys (filename/relPath/localName) to new uid for caption migration
+      window.__captionKeyMap = window.__captionKeyMap || {};
+      [t.key, t.relPath, t.localName, origKey].filter(Boolean).forEach(k => { window.__captionKeyMap[k] = stableKey; });
+      tile.dataset.key = stableKey;
+      if (t.size === 'size-2') tile.classList.add('size-2');
+      else if (t.size === 'size-3') tile.classList.add('size-3');
+      if (t.tileAR){ try{ tile.style.aspectRatio = t.tileAR; }catch(_){} }
+      if (t.arOverride){ tile.dataset.arOverride = t.arOverride; }
+      if (t.fit){ tile.dataset.fit = t.fit; if(t.fit==='fitw') tile.classList.add('fitw'); }
+
+      ensureTools(tile);
+
+      let mediaEl;
+      const isLocal = (t.srcType||'') === 'local';
+      if (t.kind === 'video'){
+        mediaEl = document.createElement('video');
+        mediaEl.playsInline = true; mediaEl.muted = true; mediaEl.loop = false;
+        mediaEl.style.width = '100%'; mediaEl.style.height = '100%';
+        mediaEl.style.objectFit = (t.fit || 'cover') || 'cover';
+        mediaEl.dataset.srcType = isLocal ? 'local' : 'url';
+        mediaEl.dataset.localName = t.localName || '';
+        mediaEl.dataset.relPath = t.relPath || t.localName || '';
+        mediaEl.dataset.key = stableKey;
+        
+        // Merge per-tile caption (preferred) into captions map
+        try{
+          if (typeof captions !== 'undefined') {
+            const tTitle = (t && typeof t.title === 'string') ? t.title : '';
+            const tDesc  = (t && typeof t.description === 'string') ? t.description : '';
+            if (tTitle || tDesc){
+              captions.set(stableKey, { title: tTitle, text: tDesc });
+            }
+          }
+        }catch(_){}
+    mediaEl.preload = 'metadata';
+
+        let srcUrl = t.src || '';
+        if (isLocal && rootDirHandle){
+          const f = await getFileFromRelPath(t.relPath || t.localName || '');
+          if (f){ srcUrl = URL.createObjectURL(f); }
+        }
+        if (srcUrl){ mediaEl.src = srcUrl; mediaEl.dataset.origSrc = srcUrl; }
+
+        // Seek to saved thumbTime (or default) and pause; build poster (best effort)
+        const seekTime = (typeof t.thumbTime === 'number' && t.thumbTime >= 0) ? t.thumbTime : 0.05;
+        mediaEl.addEventListener('loadedmetadata', ()=>{
+          try{ mediaEl.currentTime = Math.min(seekTime, Math.max(0, (mediaEl.duration||1)-0.1)); }catch(_){}
+        });
+        mediaEl.addEventListener('seeked', ()=>{ try{ mediaEl.pause(); }catch(_){} });
+        // Optional: capture frame as poster for faster paint
+        mediaEl.addEventListener('seeked', ()=>{
+          try{
+            const r = tile.getBoundingClientRect();
+            const cw = Math.max(1, Math.round(r.width));
+            const ch = Math.max(1, Math.round(r.height));
+            const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+            const ctx = c.getContext('2d');
+            // Letterbox/cover fit
+            const vw = mediaEl.videoWidth || cw, vh = mediaEl.videoHeight || ch;
+            const tr = cw/ch, vr = vw/vh;
+            let dw, dh, dx, dy;
+            if ((t.fit || 'cover') === 'contain'){
+              if (vr > tr){ dw = cw; dh = Math.round(cw/vr);} else { dh = ch; dw = Math.round(ch*vr); }
+              dx = Math.round((cw-dw)/2); dy = Math.round((ch-dh)/2);
+            } else { // cover
+              if (vr > tr){ dh = ch; dw = Math.round(ch*vr);} else { dw = cw; dh = Math.round(cw/vr); }
+              dx = Math.round((cw-dw)/2); dy = Math.round((ch-dh)/2);
+            }
+            ctx.drawImage(mediaEl, dx, dy, dw, dh);
+            const poster = c.toDataURL('image/jpeg', 0.85);
+            mediaEl.setAttribute('poster', poster);
+          }catch(err){ /* ignore cross-origin */ }
+        });
+
+      } else {
+        mediaEl = document.createElement('img');
+        mediaEl.style.width = '100%'; mediaEl.style.height = '100%'; mediaEl.style.objectFit = (t.fit || 'cover') || 'cover';
+        mediaEl.dataset.srcType = isLocal ? 'local' : 'url';
+        mediaEl.dataset.localName = t.localName || '';
+        mediaEl.dataset.relPath = t.relPath || t.localName || '';
+        mediaEl.dataset.key = stableKey;
+        
+        // Merge per-tile caption (preferred) into captions map
+        try{
+          if (typeof captions !== 'undefined') {
+            const tTitle = (t && typeof t.title === 'string') ? t.title : '';
+            const tDesc  = (t && typeof t.description === 'string') ? t.description : '';
+            if (tTitle || tDesc){
+              captions.set(stableKey, { title: tTitle, text: tDesc });
+            }
+          }
+        }catch(_){}
+    let srcUrl = t.src || '';
+        if (isLocal && rootDirHandle){
+          const f = await getFileFromRelPath(t.relPath || t.localName || '');
+          if (f){ srcUrl = URL.createObjectURL(f); }
+        }
+        if (srcUrl){ mediaEl.src = srcUrl; mediaEl.dataset.origSrc = srcUrl; }
+      }
+
+      tile.appendChild(mediaEl);
+      grid?.appendChild(tile);
+
+      if (typeof window.bindTileTools === 'function'){ try{ window.bindTileTools(tile); }catch(_){ } }
+    }
+
+    if (typeof window.updateSequenceIndices === 'function'){ try{ window.updateSequenceIndices(); }catch(_){ updateSeqBadges(); } }
+    else { updateSeqBadges(); }
+    if (typeof window.markUndraggable === 'function'){ try{ window.markUndraggable(grid); }catch(_){} }
+    if (typeof window.refreshMedia === 'function'){ try{ window.refreshMedia(); }catch(_){} }
+
+    try { grid?.dispatchEvent(new CustomEvent('board:reloaded', { detail: { tiles: data.tiles } })); } catch(_){}
+  }
+});
 </script>
 
 </body>
