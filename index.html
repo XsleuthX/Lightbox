@@ -1288,16 +1288,19 @@ function computeMediaList(){ return [...grid.querySelectorAll('.tile img,.tile v
     vid.dataset.key = uid; tile.dataset.key = uid;
     tile.appendChild(vid); appendTile(tile);
   }
-function handleFiles(files){
-    if(!files || !files.length) return;
-    [...files].forEach(f=>{
-      const url=URL.createObjectURL(f);
-      if(f.type.startsWith('image/')) addImageFromURL(url);
-      else if(f.type.startsWith('video/')) addVideoFromURL(url);
-    });
-    updateSequenceIndices(); // final authoritative refresh
-    refreshMedia();
-  }
+  function handleFiles(files){
+  if(!files || !files.length) return;
+  [...files].forEach(f=>{
+    if (f.type && f.type.startsWith('image/')) {
+      // Use the File so we can record true name + relative path
+      addImageFromFile(f);
+    } else if (f.type && f.type.startsWith('video/')) {
+      addVideoFromFile(f);
+    }
+  });
+  updateSequenceIndices(); // final authoritative refresh
+  refreshMedia();
+}
   function inferKindFromURL(url){
     const u = (url||'').split('?')[0].split('#')[0].toLowerCase();
     const imgExt = ['.jpg','.jpeg','.png','.gif','.webp','.avif','.bmp'];
