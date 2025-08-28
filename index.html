@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Lightbox I/O</title>
+<title>Museum‑Grade Photo &amp; Video UI — v1.10.4 (drop‑box reorder &amp; sequence index)</title>
 <style>
   :root{
     --bg:#0f1115; --stroke:rgba(255,255,255,.18); --text:rgba(255,255,255,.88);
@@ -580,6 +580,40 @@ background: #0f1115;
   transform: scaleX(calc(0.97 + 0.03 * var(--fold)));
   will-change: transform;
 }
+
+:root { --edge-pad: 15px; }
+
+/* keep stage full-width, but add 15px on both left/right */
+.stage{
+  max-width: none;
+  margin: 0;
+}
+
+/* left side = sidebar width + 15px, right side = 15px */
+.wrap{
+  padding-top: 28px !important;
+  padding-bottom: 28px !important;
+  padding-left: max(28px, env(safe-area-inset-left)) !important;
+  padding-right: max(28px, env(safe-area-inset-right)) !important;
+}
+
+/* ==== Minimal collapsed sidebar height ==== */
+
+:root{
+  --panel-h-min: 56px; /* collapsed height */
+}
+
+.panel{ top: 0 !important; height: 100vh !important; position: fixed; }
+
+.panel.collapsed{
+  height: var(--panel-h-min) !important;
+  top: 50% !important;
+  transform: translateY(-50%);        /* center just in collapsed mode */
+  border-radius: 12px;
+  overflow: visible;
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+}
+.panel:not(.collapsed){ transform: none !important; }
 
 </style>
 </head>
