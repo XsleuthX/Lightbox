@@ -494,14 +494,13 @@ background: #0f1115;
   position: relative;
   width: var(--panel-w);
   min-width: var(--panel-w);
-  transition: width .24s cubic-bezier(.22,.61,.36,1), min-width .24s cubic-bezier(.22,.61,.36,1);
   overflow: visible; /* so handle can sit on edge */
 }
 /* Collapsed state: content clipped; keep a slim gutter for the handle */
 .panel.collapsed{
   width: var(--panel-w-min);
   min-width: var(--panel-w-min);
-  padding-left: 0; padding-right: 0;
+  padding-left: 10; padding-right: 0;
 }
 .panel .panel-inner{ transition: opacity .18s ease; }
 .panel.collapsed .panel-inner{ opacity: 0; pointer-events: none; }
@@ -614,6 +613,82 @@ background: #0f1115;
   box-shadow: 0 10px 24px rgba(0,0,0,.25);
 }
 .panel:not(.collapsed){ transform: none !important; }
+
+/* ===== Sidebar slide animation (open ↔ collapsed) ===== */
+:root{
+  /* Adjust to your actual widths */
+  --panel-w-open: 360px;       /* full/open width */
+  --panel-w-min: 64px;         /* collapsed pill width */
+  --anim-dur: 680ms;
+  --anim-ease: cubic-bezier(.2,.7,.2,1); /* professional ease-out */
+}
+
+/* Sidebar base */
+.panel{
+  position: fixed; /* existing positioning assumed */
+  width: var(--panel-w-open);
+  height: 100vh;
+  transform: translateX(0) translateZ(0);
+  transition:
+    width var(--anim-dur) var(--anim-ease),
+    transform var(--anim-dur) var(--anim-ease),
+    box-shadow 240ms ease-out,
+    opacity 240ms linear;
+  will-change: width, transform;
+}
+
+/* Collapsed state = narrower + a subtle slide toward the edge */
+.panel.collapsed{
+  width: var(--panel-w-min) !important;
+  transform: translateX(-8px); /* tiny slide-out for polish */
+  opacity: 0.995;              /* avoid any “fade” feel */
+  box-shadow: 0 8px 24px rgba(0,0,0,.22);
+}
+
+/* If you center the collapsed bar vertically (from earlier patch), keep Y-centering: */
+.panel.collapsed{
+  top: 50% !important;
+  transform: translate(-8px, -50%); /* slide + vertical center */
+}
+.panel:not(.collapsed){ transform: translateX(0) translateZ(0); }
+
+/* Make the canvas padding animate as the sidebar width changes */
+.wrap{
+  transition: padding-left var(--anim-dur) var(--anim-ease);
+  padding-left: calc(var(--edge-pad, 15px) + var(--panel-w-open)) !important;
+}
+
+/* When collapsed, reduce the left gutter to the collapsed width */
+body:has(.panel.collapsed) .wrap{
+  padding-left: calc(var(--edge-pad, 15px) + var(--panel-w-min)) !important;
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce){
+  .panel, .wrap, .panel *{
+    transition: none !important;
+  }
+}
+
+
+
+/* === GPT patch: Lock sidebar layout (no orientation-based reflow) === */
+/* Keep the dial + actions in a single column and fix the dial size, regardless of viewport */
+:root{
+  --dial-size: 180px !important; /* tweak if you want a different fixed size */
+}
+.panel-controls{
+  grid-template-columns: 1fr !important;   /* single-column layout always */
+  align-items: center !important;
+}
+.controls-dial{
+  justify-self: center !important;
+  align-self: center !important;
+}
+/* Keep action rows consistently two columns (label | control) */
+.controls-actions .row{
+  grid-template-columns: 120px 1fr !important;
+}
 
 </style>
 </head>
